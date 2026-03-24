@@ -1,0 +1,275 @@
+<div class="table-outer">
+  <div class="table-header">
+    <div class="table-search-bar">
+      <div class="search-wrapper">
+        <i class="bx bx-search"></i>
+        <input type="text" placeholder=" Type here to search..." (keyup)="testfilter($event)"
+          [(ngModel)]="searchText" />
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Date Filters -->
+      @if (EnableDateSelection) {
+      <div class="date-filters">
+        <div class="date-input">
+          <label>From:</label>
+          <input type="date" [(ngModel)]="FromDate" />
+        </div>
+        <div class="date-input">
+          <label>To:</label>
+          <input type="date" [(ngModel)]="ToDate" />
+        </div>
+        <button style="color: green" class="btn btn-secondary" (click)="FilterRecords()">
+          <i class="bx bx-filter-alt"></i> Filter
+        </button>
+        <button style="color: red" class="btn btn-secondary" (click)="ResetFilter()" title="Clear Filters">
+          <i class="bx bx-reset"></i>Reset
+        </button>
+      </div>
+      }
+
+      @if (EnablePendingDues) {
+      <div class="pending-dues-filter">
+        <div class="input-container">
+          <input style="height: 35px;" id="pendingDues" type="number" [(ngModel)]="PendingDues" placeholder="" />
+          <label style="color: var(--primary); font-size: 11px;" for="pendingDues">Pending Count</label>
+        </div>
+
+        <button class="btn btn-secondary load-btn" (click)="LoadPendingDues()">
+          <i class="bx bx-refresh"></i> Load
+        </button>
+      </div>
+      }
+
+      <div class="download-dropdown" [class.active]="showDownloadMenu">
+        <button class="btn-small btn-secondary btn-icon-only" (click)="showDownloadMenu = !showDownloadMenu"
+          title="Download Options">
+          <i class="bx bx-cloud-download icon"></i>
+        </button>
+
+        @if (showDownloadMenu) {
+        <div class="dropdown-menu">
+          <button class="dropdown-item" (click)="ExportToExcel(); showDownloadMenu = false">
+            <i class="bx bxs-file-export icon-excel"></i> Excel
+          </button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" (click)="DownloadasPDF(); showDownloadMenu = false">
+            <i class="bx bxs-file-pdf icon-pdf"></i> PDF
+          </button>
+        </div>
+        <!-- Simple overlay to close menu on outside click -->
+        <div class="dropdown-overlay" (click)="showDownloadMenu = false"></div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="content-table">
+      <thead>
+        <tr>
+          @if (EnableCheckbox) {
+          <th>Select</th>
+          }
+          @for (element of FieldNames(); track $index) {
+          <th (click)="SortTable(element.Field_Name, $index)" [class.text-center]="
+                element.Data_Type == 'boolean' || element.Data_Type == 'image'
+              " style="cursor: pointer">
+            {{
+            element.Display_Name
+            ? element.Display_Name
+            : element.Field_Name.replace("_", " ")
+            }}
+            @if (ArrayColsSort[$index] !== undefined) {
+            <i class="bx" [class.bx-up-arrow-alt]="!ArrayColsSort[$index]"
+              [class.bx-down-arrow-alt]="ArrayColsSort[$index]"></i>
+            }
+          </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if (PagedDataList && PagedDataList.length > 0) {
+        @for (
+        row of PagedDataList[CurrentPage].PageData | search: searchText;
+        track row;
+        let i = $index
+        ) {
+        @if (i < RowsPerPage) { <tr [ngClass]="
+                  row[FieldNames()[0].Field_Name] == '{#Total#}'
+                    ? 'total-row'
+                    : ''
+                " (click)="SelectRecord(row)">
+          @if (EnableCheckbox) {
+          <td>
+            @if (row[PrimaryKey()]) {
+            <input type="checkbox" (change)="MultiSelectRecord(row[PrimaryKey()], $event)"
+              [checked]="GetFindStatus(row[PrimaryKey()])" />
+            }
+          </td>
+          }
+
+          @for (element of FieldNames(); track $index) {
+          @switch (element.Field_Name) {
+          @case ("#") {
+          @if (row[element.Field_Name] == "{#Total#}") {
+          <td></td>
+          } @else {
+          <td>{{ CurrentPage * RowsPerPage + i + 1 }}</td>
+          }
+          }
+          @case ("Actions") {
+          @if (row[element.Field_Name] == "{#Total#}") {
+          <td></td>
+          } @else {
+          <td>
+            <div class="actions">
+              <button class="action-btn edit-btn" (click)="EditRecord(row)" title="Edit">
+                <i class="bx bx-edit i1"></i>
+              </button>
+              
+              @if (EnablePrint) {
+              <button class="action-btn btn-print" (click)="PrintRecord(row, i)" title="Print">
+                <i class="bx bx-printer"></i>
+              </button>
+              }
+              <button class="action-btn delete-btn" (click)="DeleteRecord(row, i)" title="Delete">
+                <i class="bx bx-trash i2"></i>
+              </button>
+              @if (EnableMail) {
+              <button class="action-btn btn-mail" (click)="MailRecord(row, i)" title="Mail">
+                <i class="bx bx-envelope"></i>
+              </button>
+              }
+            </div>
+          </td>
+          }
+          }
+          @default {
+          @switch (element.Data_Type) {
+          @case ("date") {
+          @if (row[element.Field_Name] == "{#Total#}") {
+          <td></td>
+          } @else {
+          <td>
+            {{
+            row[element.Field_Name]
+            | intToDate
+            | date: "dd-MM-yyyy"
+            }}
+          </td>
+          }
+          }
+          @case ("number") {
+          @if (row[element.Field_Name] == "{#Total#}") {
+          <td></td>
+          } @else {
+          <td class="text-left">
+            {{
+            isNumeric(row[element.Field_Name])
+            ? (row[element.Field_Name]
+            | number
+            : (element.Decimals == 2
+            ? "1.2-2"
+            : element.Decimals == 3
+            ? "1.3-3"
+            : "1.0-0"))
+            : row[element.Field_Name]
+            }}
+          </td>
+          }
+          }
+          @case ("boolean") {
+          <td class="">
+            <span [class]="
+                                row[element.Field_Name]
+                                  ? 'status-active'
+                                  : 'status-inactive'
+                              ">
+              {{
+              row[element.Field_Name] ? "Active" : "Inactive"
+              }}
+            </span>
+          </td>
+          }
+          @case ("image") {
+          <td class="text-center">
+            @if (row[element.Field_Name]) {
+            <img [src]="row[element.Field_Name]" class="table-img" />
+            }
+          </td>
+          }
+          @case ("nested") {
+          @if (row[element.Field_Name] == "{#Total#}") {
+          <td></td>
+          } @else {
+          <td>
+            {{
+            row[element.Field_Name][element.NestedField!]
+            }}
+          </td>
+          }
+          }
+          @default {
+          @if (row[element.Field_Name] == "{#Total#}") {
+          <td class="text-right font-bold">
+            {{
+            row[element.Field_Name].replace(
+            "{#Total#}",
+            "Total"
+            )
+            }}
+          </td>
+          } @else {
+          <td>{{ row[element.Field_Name] }}</td>
+          }
+          }
+          }
+          }
+          }
+          }
+          </tr>
+          }
+          }
+          } @else {
+          <tr>
+            <td [attr.colspan]="FieldNames().length + (EnableCheckbox ? 1 : 0)" class="text-center p-4 text-muted">
+              No records found.
+            </td>
+          </tr>
+          }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer">
+    <div class="rows-per-page">
+      <span>Rows per page:</span>
+      <mat-select [(value)]="RowsPerPage" (selectionChange)="DoPagination()" class="rows-select">
+        <mat-option [value]="5">5</mat-option>
+        <mat-option [value]="10">10</mat-option>
+        <mat-option [value]="25">25</mat-option>
+        <mat-option [value]="100">100</mat-option>
+      </mat-select>
+    </div>
+
+    <div class="pagination-controls">
+      <span>Page {{ CurrentPage + 1 }} of {{ TotalPages }}</span>
+      <div class="nav-buttons">
+        <button class="icon-btn" (click)="SetCurrentPage(1)" [disabled]="CurrentPage === 0">
+          <i class="bx bx-first-page"></i>
+        </button>
+        <button class="icon-btn" (click)="SetCurrentPage(2)" [disabled]="CurrentPage === 0">
+          <i class="bx bx-chevron-left"></i>
+        </button>
+        <button class="icon-btn" (click)="SetCurrentPage(3)" [disabled]="CurrentPage >= TotalPages - 1">
+          <i class="bx bx-chevron-right"></i>
+        </button>
+        <button class="icon-btn" (click)="SetCurrentPage(4)" [disabled]="CurrentPage >= TotalPages - 1">
+          <i class="bx bx-last-page"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

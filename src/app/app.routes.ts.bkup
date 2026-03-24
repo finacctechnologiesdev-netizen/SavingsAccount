@@ -1,0 +1,318 @@
+// import { Routes } from '@angular/router';
+// import { LoginComponent } from './auth/login/login.component';
+// import { DashboardComponent } from './dashboard/dashboard.component';
+
+// import { DepositsComponent } from './dashboard/components/FD/deposits/deposits.component';
+// import { DepositComponent } from './dashboard/components/FD/deposits/deposit/deposit.component';
+// import { UserDashboardComponent } from './dashboard/components/user-dashboard/user-dashboard.component';
+
+// export const routes: Routes = [
+//      { path: '', component: LoginComponent },
+//      {
+//           path: 'dashboard', component: DashboardComponent,
+//           children: [
+//                { path: 'RD/deposits', component: DepositsComponent },
+//                { path: 'RD/deposits/deposit', component: DepositComponent },
+//                { path: 'user-dashboard', component: UserDashboardComponent }
+//           ]
+//      }
+// ];
+
+
+// import { Routes } from '@angular/router';
+
+// export const routes: Routes = [
+//      {
+//           path: '',
+//           loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
+//      },
+//      {
+//           path: 'dashboard',
+//           loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+//           children: [
+//                {
+//                     path: 'user-dashboard',
+//                     loadComponent: () => import('./dashboard/components/user-dashboard/user-dashboard.component').then(m => m.UserDashboardComponent)
+//                },
+//                {
+//                     path: 'RD/deposits',
+//                     loadComponent: () => import('./dashboard/components/FD/deposits/deposits.component').then(m => m.DepositsComponent)
+//                },
+//                {
+//                     path: 'RD/deposits/deposit',
+//                     loadComponent: () => import('./dashboard/components/FD/deposits/deposit/deposit.component').then(m => m.DepositComponent)
+//                },
+//           ]
+//      }
+// ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Eager Loading implementation
+import { Routes } from '@angular/router';
+import { authGuard } from './auth/auth.guard';
+
+// --- Import Components Eagerly ---
+import { LoginComponent } from './auth/login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { UserDashboardComponent } from './dashboard/components/user-dashboard/user-dashboard.component';
+import { SchemesComponent } from './dashboard/components/masters/schemes/schemes.component';
+import { SchemeComponent } from './dashboard/components/masters/schemes/scheme/scheme.component';
+import { AccountsComponent } from './dashboard/components/transactions/accounts/accounts.component';
+import { AccountComponent } from './dashboard/components/transactions/accounts/account/account.component';
+import { ReceiptsComponent } from './dashboard/components/transactions/receipts/receipts.component';
+import { ReceiptComponent } from './dashboard/components/transactions/receipts/receipt/receipt.component';
+import { CustomersComponent } from './dashboard/components/masters/customers/customers.component';
+import { CustomerComponent } from './dashboard/components/masters/customers/customer/customer.component';
+import { ClosuresComponent } from './dashboard/components/transactions/closures/closures.component';
+import { ClosureComponent } from './dashboard/components/transactions/closures/closure/closure.component';
+import { CompaniesComponent } from './dashboard/components/settings/companies/companies.component';
+import { CompanyComponent } from './dashboard/components/settings/companies/company/company.component';
+import { VoucherSeriesesComponent } from './dashboard/components/settings/voucher-serieses/voucher-serieses.component';
+import { VoucherSeriesComponent } from './dashboard/components/settings/voucher-serieses/voucher-series/voucher-series.component';
+import { ClientInfoComponent } from './dashboard/components/client-info/client-info.component';
+import { RdHistoryComponent } from './dashboard/components/reports/rd-history/rd-history.component';
+import { PendingReportComponent } from './dashboard/components/reports/pending-report/pending-report.component';
+import { CustomerSummaryComponent } from './dashboard/components/reports/customer-summary/customer-summary.component';
+import { AccountSummaryComponent } from './dashboard/components/reports/account-summary/account-summary.component';
+
+export const routes: Routes = [
+    {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full'
+    },
+    {
+        path: 'login',
+        component: LoginComponent
+    },
+    {
+        path: 'dashboard',
+        canActivate: [authGuard],
+        component: DashboardComponent,
+        children: [
+            {
+                path: 'user-dashboard',
+                component: UserDashboardComponent
+            },
+            // Schemes Routes
+            {
+                path: 'masters/schemes',
+                component: SchemesComponent,
+                children: [
+                    {
+                        path: 'scheme',
+                        component: SchemeComponent
+                    }
+                ]
+            },
+            // Accounts Routes
+            {
+                path: 'transactions/accounts',
+                component: AccountsComponent
+            },
+            {
+                path: 'transactions/accounts/account',
+                component: AccountComponent
+            },
+            // Receipts Routes
+            {
+                path: 'transactions/receipts',
+                component: ReceiptsComponent
+            },
+            {
+                path: 'transactions/receipts/receipt',
+                component: ReceiptComponent
+            },
+            // Customers Routes
+            {
+                path: 'masters/customers',
+                component: CustomersComponent,
+                children: [
+                    {
+                        path: 'customer',
+                        component: CustomerComponent
+                    }
+                ]
+            },
+            // Closures Routes
+            {
+                path: 'transactions/closures',
+                component: ClosuresComponent
+            },
+            {
+                path: 'transactions/closures/closure',
+                component: ClosureComponent
+            },
+            // Settings Routes
+            {
+                path: 'settings/companies',
+                component: CompaniesComponent
+            },
+            {
+                path: 'settings/companies/company',
+                component: CompanyComponent
+            },
+            {
+                path: 'settings/voucher-serieses',
+                component: VoucherSeriesesComponent
+            },
+            {
+                path: 'settings/voucher-serieses/voucher-series',
+                component: VoucherSeriesComponent
+            },
+            {
+                path: 'client-info',
+                component: ClientInfoComponent
+            },
+            {
+                path: 'reports/rd-history',
+                component: RdHistoryComponent
+            },
+            {
+                path: 'reports/pending-report',
+                component: PendingReportComponent
+            },
+            {
+                path: 'reports/customer-summary',
+                component: CustomerSummaryComponent
+            },
+            {
+                path: 'reports/account-summary',
+                component: AccountSummaryComponent
+            }
+        ]
+    }
+];
+
+
+
+//lazy loading implementation
+
+import { Routes } from '@angular/router';
+import { authGuard } from './auth/auth.guard';
+
+export const routes: Routes = [
+     {
+          path: '',
+          redirectTo: 'login',
+          pathMatch: 'full'
+     },
+     {
+          path: 'login',
+          loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
+     },
+     {
+          path: 'dashboard',
+          canActivate: [authGuard],
+          loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+          children: [
+               {
+                    path: 'company-selection',
+                    loadComponent: () => import('./dashboard/components/company-selection/company-selection.component').then(m => m.CompanySelectionComponent)
+               },
+               {
+                    path: 'user-dashboard',
+                    loadComponent: () => import('./dashboard/components/user-dashboard/user-dashboard.component').then(m => m.UserDashboardComponent)
+               },
+
+               // Schemes Routes
+               {
+                    path: 'masters/schemes',
+                    loadComponent: () => import('./dashboard/components/masters/schemes/schemes.component').then(m => m.SchemesComponent),
+                    children: [
+                         {
+                              path: 'scheme',
+                              loadComponent: () => import('./dashboard/components/masters/schemes/scheme/scheme.component').then(m => m.SchemeComponent)
+                         }
+                    ]
+               },
+               // Accounts Routes
+               {
+                    path: 'transactions/accounts',
+                    loadComponent: () => import('./dashboard/components/transactions/accounts/accounts.component').then(m => m.AccountsComponent)
+               },
+               {
+                    path: 'transactions/accounts/account',
+                    loadComponent: () => import('./dashboard/components/transactions/accounts/account/account.component').then(m => m.AccountComponent)
+               },
+               // Receipts Routes
+               {
+                    path: 'transactions/receipts',
+                    loadComponent: () => import('./dashboard/components/transactions/receipts/receipts.component').then(m => m.ReceiptsComponent)
+               },
+               {
+                    path: 'transactions/receipts/receipt',
+                    loadComponent: () => import('./dashboard/components/transactions/receipts/receipt/receipt.component').then(m => m.ReceiptComponent)
+               },
+               // Customers Routes
+               {
+                    path: 'masters/customers',
+                    loadComponent: () => import('./dashboard/components/masters/customers/customers.component').then(m => m.CustomersComponent),
+                    children: [
+                         {
+                              path: 'customer',
+                              loadComponent: () => import('./dashboard/components/masters/customers/customer/customer.component').then(m => m.CustomerComponent)
+                         }
+                    ]
+               },
+               // Closures Routes
+               {
+                    path: 'transactions/closures',
+                    loadComponent: () => import('./dashboard/components/transactions/closures/closures.component').then(m => m.ClosuresComponent)
+               },
+               {
+                    path: 'transactions/closures/closure',
+                    loadComponent: () => import('./dashboard/components/transactions/closures/closure/closure.component').then(m => m.ClosureComponent)
+               },
+               // Settings Routes
+               {
+                    path: 'settings/companies',
+                    loadComponent: () => import('./dashboard/components/settings/companies/companies.component').then(m => m.CompaniesComponent)
+               },
+               {
+                    path: 'settings/companies/company',
+                    loadComponent: () => import('./dashboard/components/settings/companies/company/company.component').then(m => m.CompanyComponent)
+               },
+               {
+                    path: 'settings/voucher-serieses',
+                    loadComponent: () => import('./dashboard/components/settings/voucher-serieses/voucher-serieses.component').then(m => m.VoucherSeriesesComponent)
+               },
+               {
+                    path: 'settings/voucher-serieses/voucher-series',
+                    loadComponent: () => import('./dashboard/components/settings/voucher-serieses/voucher-series/voucher-series.component').then(m => m.VoucherSeriesComponent)
+               },
+               {
+                    path: 'client-info',
+                    loadComponent: () => import('./dashboard/components/client-info/client-info.component').then(m => m.ClientInfoComponent)
+               },
+               {
+                    path: 'reports/rd-history',
+                    loadComponent: () => import('./dashboard/components/reports/rd-history/rd-history.component').then(m => m.RdHistoryComponent)
+               },
+               {
+                    path: 'reports/pending-report',
+                    loadComponent: () => import('./dashboard/components/reports/pending-report/pending-report.component').then(m => m.PendingReportComponent)
+               },
+               {
+                    path: 'reports/customer-summary',
+                    loadComponent: () => import('./dashboard/components/reports/customer-summary/customer-summary.component').then(m => m.CustomerSummaryComponent)
+               },
+               {
+                    path: 'reports/account-summary',
+                    loadComponent: () => import('./dashboard/components/reports/account-summary/account-summary.component').then(m => m.AccountSummaryComponent)
+               }
+          ]
+     }
+];

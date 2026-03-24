@@ -1,0 +1,240 @@
+<div class="form-viewport">
+  <header class="form-header-slim">
+    <div class="header-info">
+      <h2>{{ isEditMode ? "Edit Receipt" : "Create New Receipt" }}</h2>
+    </div>
+    <div class="header-actions">
+      <button (click)="cancelReceipt()" type="button" class="btn-cancel">
+        <i class="bx bx-x"></i>
+        Cancel
+      </button>
+      <button (click)="saveReceipt()" type="button" class="btn-save">
+        <i class="bx bx-save"></i>
+        {{ isEditMode ? "Update" : "Save" }}
+      </button>
+    </div>
+  </header>
+
+  <div class="form-main-layout">
+    <form>
+      <div class="row-flex align-start">
+        <!-- LEFT COLUMN (50%) -->
+        <div class="w-50 form-left-col">
+          <!-- Row 1: Series No & Receipt No -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <select id="SeriesSno" name="SeriesSno" [(ngModel)]="Receipt.SeriesSno"
+                (change)="onSeriesChange()"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['SeriesSno']">
+                <option [ngValue]="0" disabled>Select Series</option>
+                @for (series of seriesList; track series.SeriesSno) {
+                <option [ngValue]="series.SeriesSno">
+                  {{ series.Series_Name }}
+                </option>
+                }
+              </select>
+              <label for="SeriesSno">Series <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["SeriesSno"]) {
+              <span class="error-msg">{{ errors["SeriesSno"] }}</span>
+              }
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Receipt_No" name="Receipt_No" [(ngModel)]="Receipt.Receipt_No"
+                [disabled]="isReceiptNoDisabled"
+                [class.disabled-input]="isReceiptNoDisabled"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Receipt_No']" placeholder=" " (keypress)="
+                  this.globals.checklength10(
+                    $event,
+                    'Receipt No should be 10 characters'
+                  )
+                " maxlength="10" />
+              <label for="Receipt_No">Receipt No <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["Receipt_No"]) {
+              <span class="error-msg">{{ errors["Receipt_No"] }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Row 2: Receipt Date & Account Selection -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <input type="date" id="Receipt_Date" name="Receipt_Date" [(ngModel)]="Receipt.Receipt_Date"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Receipt_Date']" placeholder=" " />
+              <label for="Receipt_Date">Receipt Date <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["Receipt_Date"]) {
+              <span class="error-msg">{{ errors["Receipt_Date"] }}</span>
+              }
+            </div>
+            <div class="input-container w-50" style="position: relative;">
+              @if (accountsForDropdown.length === 0) {
+              <input type="text" [disabled]="true" placeholder="Loading accounts..." class="disabled-input">
+              <label>Account No <span class="req">*</span></label>
+              } @else {
+              <app-selectionlist [DataSource]="accountsForDropdown" Caption="Account No *"
+                [SelectedItem]="selectedAccountForDropdown"
+                (newItemEvent)="onAccountItemSelected($event)"></app-selectionlist>
+              }
+              @if (submitCount > 0 && errors["SbAcSno"]) {
+              <span class="error-msg"
+                [ngStyle]="accountsForDropdown.length > 0 ? {'right': '2.5rem'} : null">{{ errors["SbAcSno"] }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Row 3: Customer -->
+          <div class="input-container w-100">
+            <input type="text" id="Customer" name="Customer" [value]="selectedCustomer?.Party_Name || ''"
+              placeholder=" " disabled />
+            <label for="Customer">Customer</label>
+          </div>
+
+          <!-- Row 4: Amount -->
+          <div class="row-flex mb-0">
+             <div class="input-container w-100">
+              <input type="number" id="Amount" name="Amount" [(ngModel)]="Receipt.Amount" appInputBehavior
+                [minVal]="0" (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Amount']" placeholder=" " />
+              <label for="Amount">Amount <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["Amount"]) {
+              <span class="error-msg">{{ errors["Amount"] }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Row 5: Payment Mode & Reference -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <select id="Payment_Mode" name="Payment_Mode" [(ngModel)]="Receipt.Payment_Mode">
+                <option [ngValue]="1">Cash</option>
+                <option [ngValue]="2">Bank</option>
+                <option [ngValue]="3">UPI</option>
+              </select>
+              <label for="Payment_Mode">Payment Mode <span class="req">*</span></label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Reference" name="Reference" [(ngModel)]="Receipt.Reference" placeholder=" " />
+              <label for="Reference">Reference</label>
+            </div>
+          </div>
+
+          <!-- Row 6: Remarks -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-100">
+              <textarea id="Remarks" name="Remarks" [(ngModel)]="Receipt.Remarks" placeholder=" "
+                class="remarks-field"></textarea>
+              <label for="Remarks">Remarks</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN (50%) -->
+        <div class="w-50 form-right-col">
+          <!-- Top 60%: Account Details -->
+          <div class="details-card account-card">
+            <h6 class="group-label">Account Details</h6>
+
+            @if (selectedAccount) {
+            <div class="account-details-container">
+              <div class="account-info-section">
+                <div class="info-row">
+                  <div class="info-item">
+                    <span class="info-label">Account Number</span>
+                    <span class="info-value">{{
+                      selectedAccount.SbAccount_No
+                      }}</span>
+                  </div>
+                  <div class="info-item text-right">
+                    <span class="info-label">Customer</span>
+                    <span class="info-value">{{
+                      selectedCustomer?.Party_Name || 'NIL'
+                      }}</span>
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-item">
+                    <span class="info-label">Passbook No</span>
+                    <span class="info-value">{{
+                      selectedAccount.Passbook_No || 'NIL'
+                      }}</span>
+                  </div>
+                  <div class="info-item text-right">
+                    <span class="info-label">Account Date</span>
+                    <span class="info-value">{{
+                      (selectedAccount.CreateDate?.date || selectedAccount.CreateDate) | date: "dd/MM/yyyy"
+                      }}</span>
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-item">
+                    <span class="info-label">Joint Customer</span>
+                    <span class="info-value">{{
+                      selectedJointCustomer?.Party_Name || 'NIL'
+                      }}</span>
+                  </div>
+                  <div class="info-item text-right">
+                    <span class="info-label">Account Status</span>
+                    <span class="info-value" [class]="
+                          selectedAccount.IsActive == 1
+                            ? 'text-success'
+                            : 'text-danger'
+                        ">{{
+                      selectedAccount.IsActive == 1 ? "Active" : "Inactive"
+                      }}</span>
+                  </div>
+                </div>
+
+                <div class="info-row no-border-bottom">
+                   <div class="info-item">
+                     <span class="info-label">Current Balance</span>
+                     <span class="info-value text-success amount-highlight"><i class="bx bx-rupee"></i>
+                       {{ accountSummary?.Balance || 0 }}</span>
+                   </div>
+                   <div class="info-item text-right">
+                     <span class="info-label">Last Receipt Date</span>
+                     <span class="info-value">{{
+                       accountSummary?.Last_Receipt_Date || 'NIL'
+                       }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            } @else {
+            <div class="empty-state empty-account">
+              <i class="bx bx-file"></i>
+              <p>Select an account to view details</p>
+            </div>
+            }
+          </div>
+
+          <!-- Bottom 40%: Statement -->
+          <div class="details-card statement-card">
+            <h6 class="group-label">Statement</h6>
+
+            <div class="statement-container">
+              <div class="statement-item received">
+                <p class="statement-label">Last Received</p>
+                <p class="statement-value">
+                  <i class="bx bx-rupee"></i> 0.00
+                  <span class="statement-date">on --/--/----</span>
+                </p>
+              </div>
+              <div class="statement-item collected">
+                <p class="statement-label">Total Collected</p>
+                <p class="statement-value"><i class="bx bx-rupee"></i> 0.00</p>
+              </div>
+
+              <p class="statement-footer">
+                * Recent transaction history is currently unavailable.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

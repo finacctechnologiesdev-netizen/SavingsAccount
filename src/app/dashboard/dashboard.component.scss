@@ -1,0 +1,52 @@
+/* Dashboard layout — Design system (rem, CSS variables). */
+
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.sidebar-wrapper {
+  flex-shrink: 0;
+  height: 100%;
+  z-index: 50;
+}
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+}
+
+.header-wrapper {
+  flex-shrink: 0;
+  width: 100%;
+  z-index: 40;
+}
+
+.content-body {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  //padding: var(--space-lg);
+
+  background: var(--color-bg);
+
+  // Hide overall scrollbars
+  -ms-overflow-style: none; // IE and Edge
+  scrollbar-width: none; // Firefox
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Opera
+  }
+}
+
+@media (max-width: 48rem) {
+  .content-body {
+    padding: var(--space-md);
+  }
+}

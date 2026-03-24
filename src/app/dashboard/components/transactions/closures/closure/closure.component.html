@@ -1,0 +1,335 @@
+<div class="form-viewport">
+  <header class="form-header-slim">
+    <div class="header-info">
+      <h2>{{ isEditMode ? "Edit Closure" : "Create New Closure" }}</h2>
+    </div>
+    <div class="header-actions">
+      <button (click)="cancelClosure()" type="button" class="btn-cancel">
+        <i class="bx bx-x"></i>
+        Cancel
+      </button>
+      <button (click)="saveClosure()" type="button" class="btn-save">
+        <i class="bx bx-save"></i>
+        {{ isEditMode ? "Update" : "Save" }}
+      </button>
+    </div>
+  </header>
+
+  <div class="form-main-layout">
+    <form>
+      <div class="row-flex align-start">
+        <!-- LEFT COLUMN (50%) -->
+        <div class="w-50 form-left-col">
+          <!-- Row 1: Series No & Closure No -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <select
+                id="SeriesSno"
+                name="SeriesSno"
+                [(ngModel)]="Closure.SeriesSno"
+                (change)="onSeriesChange()"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['SeriesSno']"
+              >
+                <option [ngValue]="0" disabled>Select Series</option>
+                @for (series of seriesList; track series.SeriesSno) {
+                  <option [ngValue]="series.SeriesSno">
+                    {{ series.Series_Name }}
+                  </option>
+                }
+              </select>
+              <label for="SeriesSno">Series <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["SeriesSno"]) {
+                <span class="error-msg">{{ errors["SeriesSno"] }}</span>
+              }
+            </div>
+            <div class="input-container w-50">
+              <input
+                type="text"
+                id="Closure_No"
+                name="Closure_No"
+                [(ngModel)]="Closure.Closure_No"
+                [disabled]="isClosureNoDisabled"
+                [class.disabled-input]="isClosureNoDisabled"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Closure_No']"
+                placeholder=" "
+                (keypress)="
+                  this.globals.checklength10(
+                    $event,
+                    'Closure No should be 10 characters'
+                  )
+                "
+                maxlength="10"
+              />
+              <label for="Closure_No"
+                >Closure No <span class="req">*</span></label
+              >
+              @if (submitCount > 0 && errors["Closure_No"]) {
+                <span class="error-msg">{{ errors["Closure_No"] }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Row 2: Closure Date & Account Selection -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <input
+                type="date"
+                id="Closure_Date"
+                name="Closure_Date"
+                [(ngModel)]="Closure.Closure_Date"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Closure_Date']"
+                placeholder=" "
+              />
+              <label for="Closure_Date"
+                >Closure Date <span class="req">*</span></label
+              >
+              @if (submitCount > 0 && errors["Closure_Date"]) {
+                <span class="error-msg">{{ errors["Closure_Date"] }}</span>
+              }
+            </div>
+            <div class="input-container w-50" style="position: relative">
+              @if (accountsForDropdown.length === 0) {
+                <input
+                  type="text"
+                  [disabled]="true"
+                  placeholder="Loading accounts..."
+                  class="disabled-input"
+                />
+                <label>Account No <span class="req">*</span></label>
+              } @else {
+                <app-selectionlist
+                  [DataSource]="accountsForDropdown"
+                  Caption="Account No *"
+                  [SelectedItem]="selectedAccountForDropdown"
+                  (newItemEvent)="onAccountItemSelected($event)"
+                ></app-selectionlist>
+              }
+              @if (submitCount > 0 && errors["RdAccountSno"]) {
+                <span
+                  class="error-msg"
+                  [ngStyle]="
+                    accountsForDropdown.length > 0 ? { right: '2.5rem' } : null
+                  "
+                  >{{ errors["RdAccountSno"] }}</span
+                >
+              }
+            </div>
+          </div>
+
+          <!-- Row 3: Customer -->
+          <div class="input-container w-100">
+            <input
+              type="text"
+              id="Customer"
+              name="Customer"
+              [value]="selectedCustomer?.Party_Name || ''"
+              placeholder=" "
+              disabled
+            />
+            <label for="Customer">Customer</label>
+          </div>
+
+          <!-- Row 4: Closure Method & Total Amount -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <select
+                id="Closure_Method"
+                name="Closure_Method"
+                [(ngModel)]="Closure.Closure_Method"
+                
+              >
+                <option [ngValue]="1">Normal Maturity</option>
+                <option [ngValue]="2">Premature Closure</option>
+              </select>
+              <label for="Closure_Method">Closure Method</label>
+            </div>
+            <div class="input-container w-50">
+              <input
+                type="number"
+                id="Total_Amount"
+                name="Total_Amount"
+                [(ngModel)]="Closure.Total_Amount"
+                appInputBehavior
+                [minVal]="0"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                (ngModelChange)="calculateAmount()"
+                [class.error]="submitCount > 0 && errors['Total_Amount']"
+                placeholder=" "
+                disabled
+              />
+              <label for="Total_Amount">Total Amount</label>
+              @if (submitCount > 0 && errors["Total_Amount"]) {
+                <span class="error-msg">{{ errors["Total_Amount"] }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Row 5: Interest Amount & Nett Amount -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <input
+                type="number"
+                id="Interest_Amount"
+                name="Interest_Amount"
+                [(ngModel)]="Closure.Interest_Amount"
+                appInputBehavior
+                [minVal]="0"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                (ngModelChange)="calculateAmount()"
+                [class.error]="submitCount > 0 && errors['Interest_Amount']"
+                placeholder=" "
+                disabled
+              />
+              <label for="Interest_Amount">Interest Amount</label>
+              @if (submitCount > 0 && errors["Interest_Amount"]) {
+                <span class="error-msg">{{ errors["Interest_Amount"] }}</span>
+              }
+            </div>
+            <div class="input-container w-50">
+              <i class="bx bx-rupee prefix-rupee"></i>
+              <input
+                type="text"
+                id="Nett_Amount"
+                name="Nett_Amount"
+                [value]="Closure.Nett_Amount || 0"
+                placeholder=" "
+                disabled
+                class="net-payable-fixed with-prefix"
+              />
+              <label for="Nett_Amount">Nett Amount</label>
+            </div>
+          </div>
+
+          <!-- Row 6: Remarks -->
+          <div class="row-flex mb-0">
+            <div class="input-container w-100">
+              <textarea
+                id="Remarks"
+                name="Remarks"
+                [(ngModel)]="Closure.Remarks"
+                placeholder=" "
+                class="remarks-field"
+              ></textarea>
+              <label for="Remarks">Remarks</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN (50%) -->
+        <div class="w-50 form-right-col">
+          <!-- Top 60%: Account Details -->
+          <div class="details-card account-card">
+            <h6 class="group-label">Account Details</h6>
+
+            @if (selectedAccount && selectedCustomer) {
+              <div class="account-details-container">
+                <div class="account-info-section">
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Account Number</span>
+                      <span class="info-value">{{
+                        selectedAccount.Account_No
+                      }}</span>
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Customer</span>
+                      <span class="info-value">{{
+                        selectedCustomer.Party_Name
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Account Date</span>
+                      <span class="info-value">{{
+                        selectedAccount.Account_Date.date | date: "dd/MM/yyyy"
+                      }}</span>
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Account Status</span>
+                      <span
+                        class="info-value"
+                        [class]="
+                          selectedAccount.IsActive == 1
+                            ? 'text-success'
+                            : 'text-danger'
+                        "
+                        >{{
+                          selectedAccount.IsActive == 1 ? "Active" : "Inactive"
+                        }}</span
+                      >
+                    </div>
+                  </div>
+
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Paid Dues</span>
+                      <span class="info-value">{{
+                        accountSummary?.Paid_Dues || 0
+                      }}</span>
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Pending Dues</span>
+                      <span class="info-value">{{
+                        accountSummary?.Balance_Dues || 0
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div class="info-row no-border-bottom">
+                    <div class="info-item">
+                      <span class="info-label">Paid Amount</span>
+                      <span class="info-value text-success amount-highlight"
+                        ><i class="bx bx-rupee"></i>
+                        {{ accountSummary?.Paid_Amount || 0 }}</span
+                      >
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Pending Amount</span>
+                      <span class="info-value text-danger amount-highlight"
+                        ><i class="bx bx-rupee"></i>
+                        {{ accountSummary?.Balance_Amount || 0 }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="empty-state empty-account">
+                <i class="bx bx-file"></i>
+                <p>Select an account to view details</p>
+              </div>
+            }
+          </div>
+
+          <!-- Bottom 40%: Statement -->
+          <div class="details-card statement-card">
+            <h6 class="group-label">Statement</h6>
+
+            <div class="statement-container">
+              <div class="statement-item received">
+                <p class="statement-label">Last Received</p>
+                <p class="statement-value">
+                  <i class="bx bx-rupee"></i> 0.00
+                  <span class="statement-date">on --/--/----</span>
+                </p>
+              </div>
+              <div class="statement-item collected">
+                <p class="statement-label">Total Collected</p>
+                <p class="statement-value"><i class="bx bx-rupee"></i> 0.00</p>
+              </div>
+
+              <p class="statement-footer">
+                * Recent transaction history is currently unavailable.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

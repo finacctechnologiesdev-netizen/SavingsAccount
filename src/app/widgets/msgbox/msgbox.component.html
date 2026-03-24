@@ -1,0 +1,49 @@
+<div class="msgbox-overlay">
+    <div class="msgbox-container">
+        <!-- Close Button -->
+        <button class="close-btn" (click)="CloseDialog(0)" aria-label="Close">
+            <i class='bx bx-x'></i>
+        </button>
+
+        <!-- Icon Section -->
+        <div class="icon-wrapper">
+            <div class="icon-circle" [ngClass]="{
+                'icon-info': data.DialogType === 1,
+                'icon-question': data.DialogType === 2,
+                'icon-error': data.DialogType === 3
+            }">
+                <i *ngIf="data.DialogType === 1" class="bx bx-info-circle"></i>
+                <i *ngIf="data.DialogType === 2" class="bx bx-help-circle"></i>
+                <i *ngIf="data.DialogType === 3" class="bx bx-error-circle"></i>
+            </div>
+        </div>
+
+        <!-- Message Section -->
+        <div class="message-section">
+            <h3 class="message-title">
+                {{ data.DialogType === 1 ? 'Information' : data.DialogType === 2 ? 'Confirmation' : 'Error' }}
+            </h3>
+            <p class="message-text">{{ data.Message }}</p>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="actions-section">
+            <!-- Information & Error: OK button only -->
+            <ng-container *ngIf="data.DialogType === 1 || data.DialogType === 3">
+                <button class="btn btn-primary" (click)="CloseDialog(1)">
+                    OK
+                </button>
+            </ng-container>
+
+            <!-- Question: Yes & No buttons -->
+            <ng-container *ngIf="data.DialogType === 2">
+                <button class="btn btn-secondary" (click)="CloseDialog(0)">
+                    Cancel
+                </button>
+                <button class="btn btn-danger" (click)="CloseDialog(1)">
+                    Confirm
+                </button>
+            </ng-container>
+        </div>
+    </div>
+</div>

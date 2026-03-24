@@ -1,0 +1,97 @@
+<div class="drawer-overlay">
+  <div class="drawer-panel" (click)="$event.stopPropagation()">
+    <header class="drawer-header">
+      <h2>{{ isEditMode ? "Edit Savings Account" : "Create New Savings Account" }}</h2>
+      <button type="button" class="close-btn" (click)="cancelAccount()">
+        <i class="bx bx-x"></i>
+      </button>
+    </header>
+
+    <div class="drawer-body">
+      <form #accountForm="ngForm">
+        <h6 class="group-label">Account Details</h6>
+
+        <div class="row-flex">
+          <div class="input-container w-50">
+            <input type="text" id="SbAccount_No" name="SbAccount_No" [(ngModel)]="Account.SbAccount_No"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['SbAccount_No']" placeholder=" " maxlength="20" />
+            <label for="SbAccount_No">Account No <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["SbAccount_No"]) {
+              <span class="error-msg">{{ errors["SbAccount_No"] }}</span>
+            }
+          </div>
+
+          <div class="input-container w-50">
+            <input type="text" id="Passbook_No" name="Passbook_No" [(ngModel)]="Account.Passbook_No"
+              placeholder=" " />
+            <label for="Passbook_No">Passbook No</label>
+          </div>
+        </div>
+
+        <div class="row-flex">
+          <div class="input-container w-50">
+            <input type="number" id="AcTypeSno" name="AcTypeSno" [(ngModel)]="Account.AcTypeSno" placeholder=" " />
+            <label for="AcTypeSno">Account Type</label>
+          </div>
+
+          <div class="input-container w-50" style="position: relative;">
+            <app-selectionlist [DataSource]="customersForDropdown" Caption="Primary Customer *"
+              [SelectedItem]="selectedCustomerForDropdown"
+              (newItemEvent)="onCustomerSelected($event)"></app-selectionlist>
+            @if (submitCount > 0 && errors['PartySno']) {
+              <span class="error-msg" style="right: 2.5rem">{{ errors['PartySno'] }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="row-flex">
+          <div class="input-container w-50" style="position: relative;">
+            <app-selectionlist [DataSource]="customersForDropdown" Caption="Joint Customer (Optional)"
+              [SelectedItem]="selectedJointCustomerForDropdown"
+              (newItemEvent)="onJointCustomerSelected($event)"></app-selectionlist>
+          </div>
+
+          <div class="input-container w-50" style="position: relative;">
+            <app-selectionlist [DataSource]="customersForDropdown" Caption="Reference Customer (Optional)"
+              [SelectedItem]="selectedRefCustomerForDropdown"
+              (newItemEvent)="onRefCustomerSelected($event)"></app-selectionlist>
+          </div>
+        </div>
+
+        <div class="row-flex">
+          <div class="input-container w-100">
+            <textarea id="Remarks" name="Remarks" [(ngModel)]="Account.Remarks" placeholder=" "
+              class="remarks-field"></textarea>
+            <label for="Remarks">Remarks</label>
+          </div>
+        </div>
+
+        <hr class="group-divider" />
+        <h6 class="group-label">Properties</h6>
+
+        <div class="row-flex flex-col">
+          <div class="toggle-wrapper w-100">
+            <span class="status-label">Status:</span>
+            <label class="switch">
+              <input
+                type="checkbox"
+                name="IsActive"
+                [ngModel]="Account.IsActive === 1"
+                (ngModelChange)="Account.IsActive = $event ? 1 : 0"
+              />
+              <span class="slider"></span>
+            </label>
+            <span class="status-text">{{ Account.IsActive === 1 ? "Active" : "Inactive" }}</span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <footer class="drawer-footer">
+      <button type="button" class="btn-save-drawer" (click)="saveAccount()">
+        <i class="bx bx-save"></i> {{ isEditMode ? "Update" : "Save" }}
+      </button>
+    </footer>
+  </div>
+</div>

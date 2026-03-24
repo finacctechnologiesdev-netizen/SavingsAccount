@@ -1,0 +1,174 @@
+<div class="form-viewport">
+  <header class="form-header-slim">
+    <div class="header-info">
+      <h2>
+        {{ isEditMode ? "Edit Voucher Series" : "Create New Voucher Series" }}
+      </h2>
+    </div>
+    <div class="header-actions">
+      <button (click)="cancelSeries()" type="button" class="btn-cancel">
+        <i class="bx bx-x"></i>
+        Cancel
+      </button>
+      <button (click)="saveSeries()" type="button" class="btn-save">
+        <i class="bx bx-save"></i>
+        {{ isEditMode ? "Update" : "Save" }}
+      </button>
+    </div>
+  </header>
+
+  <div class="form-scroll-content">
+    <form class="clean-form-layout">
+      <div class="form-section">
+        <h6 class="group-label">Basic Information</h6>
+        <div class="form-row">
+          <div class="input-container flex-2">
+            <input type="text" id="Series_Name" name="Series_Name" [(ngModel)]="Series.Series_Name"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['Series_Name']" placeholder=" " />
+            <label for="Series_Name">Series Name <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["Series_Name"]) {
+            <span class="error-msg">{{ errors["Series_Name"] }}</span>
+            }
+          </div>
+
+          <div class="input-container flex-1">
+            <select id="Num_Method" name="Num_Method" [(ngModel)]="Series.Num_Method">
+              <option [ngValue]="0">Manual</option>
+              <option [ngValue]="1">Semi</option>
+              <option [ngValue]="2">Auto</option>
+            </select>
+            <label for="Num_Method">Numbering Method</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h6 class="group-label">Sequence Logic</h6>
+        <div class="form-row">
+          <div class="input-container flex-1">
+            <input type="number" id="Start_No" name="Start_No" [(ngModel)]="Series.Start_No"
+              (blur)="submitCount > 0 ? validateFields() : null" [class.error]="submitCount > 0 && errors['Start_No']"
+              placeholder=" " />
+            <label for="Start_No">Start No <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["Start_No"]) {
+            <span class="error-msg">{{ errors["Start_No"] }}</span>
+            }
+          </div>
+
+          <div class="input-container flex-1">
+            <input type="number" id="Current_No" name="Current_No" [(ngModel)]="Series.Current_No"
+              (blur)="submitCount > 0 ? validateFields() : null" [class.error]="submitCount > 0 && errors['Current_No']"
+              placeholder=" " />
+            <label for="Current_No">Current No <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["Current_No"]) {
+            <span class="error-msg">{{ errors["Current_No"] }}</span>
+            }
+          </div>
+
+          <div class="input-container flex-1">
+            <select id="Allow_Duplicate" name="Allow_Duplicate" [(ngModel)]="Series.Allow_Duplicate">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+            <label for="Allow_Duplicate">Allow Duplicate</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h6 class="group-label">Formatting Options</h6>
+        <div class="form-row">
+          <div class="input-container flex-1">
+            <input type="text" id="Prefix" name="Prefix" [(ngModel)]="Series.Prefix" placeholder=" " />
+            <label for="Prefix">Prefix</label>
+          </div>
+
+          <div class="input-container flex-1">
+            <input type="text" id="Suffix" name="Suffix" [(ngModel)]="Series.Suffix" placeholder=" " />
+            <label for="Suffix">Suffix</label>
+          </div>
+
+          <div class="input-container flex-1">
+            <input type="number" id="Width" name="Width" [(ngModel)]="Series.Width" placeholder=" " />
+            <label for="Width">Width</label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="input-container flex-1">
+            <input type="text" id="Prefill" name="Prefill" [(ngModel)]="Series.Prefill" placeholder=" " />
+            <label for="Prefill">Prefill Character</label>
+          </div>
+
+          <div class="input-container flex-2">
+            <div class="toggle-wrapper">
+              <span class="status-label">Status:</span>
+              <label class="switch">
+                <input type="checkbox" name="Active_Status" [ngModel]="Series.Active_Status === 1"
+                  (ngModelChange)="Series.Active_Status = $event ? 1 : 0" />
+                <span class="slider"></span>
+              </label>
+              <span class="status-text">{{
+                Series.Active_Status === 1 ? "Active" : "Inactive"
+                }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="form-section no-border">
+        <h6 class="group-label">Printing & Standards</h6>
+        <div class="form-row">
+           <div class="input-container flex-1">
+            <select id="Print_Voucher" name="Print_Voucher" [(ngModel)]="Series.Print_Voucher">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+            <label for="Print_Voucher">Print Voucher</label>
+          </div>
+          
+           <div class="input-container flex-1">
+            <select id="Print_On_Save" name="Print_On_Save" [(ngModel)]="Series.Print_On_Save">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+            <label for="Print_On_Save">Print On Save</label>
+          </div>
+          
+           <div class="input-container flex-1">
+            <select id="Show_Preview" name="Show_Preview" [(ngModel)]="Series.Show_Preview">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+            <label for="Show_Preview">Show Preview</label>
+          </div>
+        </div>
+        
+        <div class="form-row">
+           <div class="input-container flex-1">
+              <input type="text" id="Print_Style" name="Print_Style" [(ngModel)]="Series.Print_Style" placeholder=" " />
+              <label for="Print_Style">Print Style</label>
+           </div>
+           
+           <div class="input-container flex-1">
+            <select id="IsDefault" name="IsDefault" [(ngModel)]="Series.IsDefault">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+            <label for="IsDefault">Is Default</label>
+          </div>
+          
+           <div class="input-container flex-1">
+            <select id="IsStd" name="IsStd" [(ngModel)]="Series.IsStd">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+            <label for="IsStd">Is Std</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

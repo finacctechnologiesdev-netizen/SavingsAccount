@@ -1,0 +1,49 @@
+<div class="modal-overlay">
+  <div class="modal-content company-modal">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="title-with-icon">
+        <i class="bx bx-buildings"></i>
+        <h2>Companies List</h2>
+      </div>
+      <button class="close-btn" *ngIf="canClose" (click)="closeModal()">
+        <i class="bx bx-x"></i>
+      </button>
+    </div>
+
+    <!-- Table content -->
+    <div class="modal-body p-0">
+      <div class="native-table-container">
+        <table class="native-data-table company-table">
+          <thead>
+            <tr>
+              <th class="w-10">No</th>
+              <th class="w-40">Company Name</th>
+              <th class="w-25">Location</th>
+              <th class="w-25">Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (comp of companies; track comp.Comp_Code; let i = $index) {
+            <tr
+              (click)="selectCompany(comp)"
+              class="company-row"
+              [class.active-row]="isActive(comp)"
+            >
+              <td>{{ i + 1 }}</td>
+              <td class="fw-bold company-name-cell">
+                {{ comp.Comp_Name }}
+                @if (isActive(comp)) {
+                  <span class="active-check"><i class="bx bx-check-circle"></i></span>
+                }
+              </td>
+              <td class="text-muted"><i class="bx bx-map"></i> {{ comp.City || 'NIL' }}</td>
+              <td class="text-muted"><i class="bx bx-phone"></i> {{ comp.Phone || 'NIL' }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

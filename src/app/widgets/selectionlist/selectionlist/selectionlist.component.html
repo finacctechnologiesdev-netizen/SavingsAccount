@@ -1,0 +1,133 @@
+<div
+  class="listContainer"
+  clickOutside
+  (clickOutside)="clickedOutside(); focused = false"
+>
+  <div class="formGroup">
+    <input
+      #InputBox
+      type="text"
+      (focus)="DisplayList(); focused = true"
+      (input)="sendTypedString($event)"
+      (blur)="HideList()"
+      (keyup)="FilterList($event)"
+      class="formControl"
+      required
+      [value]="
+        SelectedItem === undefined
+          ? ''
+          : SelectedItem.Name === undefined
+            ? ''
+            : SelectedItem.Name
+      "
+    />
+    <label for="" class="formLabel">{{ Caption }}</label>
+
+    <ng-container *ngIf="!SelectedItem || SelectedItem.Name === undefined">
+      <i
+        class="rightIcon bx bx-arrow-down"
+        style="color: #3f3939; font-size: 14px"
+      ></i>
+    </ng-container>
+
+    <ng-container
+      *ngIf="
+        SelectedItem &&
+        SelectedItem.Name !== undefined &&
+        SelectedItem.Name !== ''
+      "
+    >
+      <!-- <i class="rightTopCornerIcon fa-solid fa-circle-check" style="color: green;" ></i> -->
+      <i
+        *ngIf="focused"
+        class="rightIcon bx bx-x"
+        style="color: red; opacity: 0.6; font-size: 16px"
+        (click)="ClearItem()"
+      ></i>
+      <i
+        *ngIf="!focused"
+        class="rightTopCornerIcon bx bx-check-circle"
+        style="color: rgb(6, 165, 6); opacity: 1; font-size: 16px"
+      ></i>
+    </ng-container>
+
+    <div class="listBox" *ngIf="showList == true">
+      <div class="addBar">
+        <!-- <i (click)="OpenMaster()" class="bx bx-plus"></i>
+                <p (click)="OpenMaster()" >Select </p>-->
+
+        <svg
+          style="color: green"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M21 12.06c.02-.41-.2-.79-.58-.96l-15-7.01c-.38-.18-.83-.1-1.13.2s-.38.75-.2 1.13l7 15c.17.35.52.58.91.58h.06c.41-.02.76-.29.89-.68l1.84-5.53 5.53-1.84c.39-.13.66-.48.68-.89m-7.31.99c-.3.1-.53.33-.63.63l-1.21 3.62L7.07 7.07l10.23 4.78-3.62 1.21ZM20 2h-2v2h-2v2h2v2h2V6h2V4h-2z"
+          ></path>
+        </svg>
+        <p>Select</p>
+        <hr />
+      </div>
+
+      <div class="content">
+        @defer (when FilteredData) {
+          @for (pty of FilteredData; track $index) {
+            <ul>
+              <li
+                class="listItems"
+                (click)="SelectItem($index)"
+                [ngClass]="{ active: $index === activeIndex }"
+              >
+                <div class="details">
+                  <p class="name">{{ pty.Name }}</p>
+                  <p class="area">{{ pty.Details }}</p>
+                </div>
+
+                <div class="buttonsArea">
+                  <i class="bx bx-checks selectItem"></i>
+                  <!-- <i class='bx  bx-edit'  ></i> -->
+                </div>
+              </li>
+            </ul>
+          }
+        } @placeholder {
+          <div
+            style="
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <!-- <img src="assets/images/loading.gif" alt="" style="height: 8rem; width: 8rem;" >
+                            <span style="font-size: .9rem;" >Loading List...</span> -->
+            <span style="text-align: center"
+              >Type min 3 letters to search...</span
+            >
+          </div>
+        } @loading {
+          <p>Loading...</p>
+        }
+        <!-- <ul *ngFor="let pty of FilteredData; let i = index" >
+                    <li class="listItems" (click)="SelectItem(i)" [ngClass]="{active: i===activeIndex}">  
+
+                        <div class="details"> 
+                            <p class="name" >{{pty.Name}} </p>
+                            <p class="area" >{{pty.Details}} </p>                            
+                        </div>       
+                        
+                        <div class="buttonsArea">
+                            <i class="fa-solid fa-check-double selectItem"></i>
+                            <i class="fa-regular fa-pen-to-square"></i>
+                        </div>
+
+                    </li>                    
+                </ul> -->
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,142 @@
+// @import '../../../../styles.scss';
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  /* Override global input-container if specific positioning is needed */
+}
+
+input {
+  /* Inherit global input styles, but add cursor pointer if it behaves like a select trigger */
+  cursor: pointer;
+  padding-right: 2rem;
+  /* Make room for arrow */
+
+  &:focus {
+    border-color: var(--primary);
+  }
+
+  &.error {
+    border-color: var(--color-danger) !important;
+    &:focus {
+      box-shadow: 0 0 0 0.125rem rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  &.error + label {
+    color: var(--color-danger) !important;
+  }
+}
+
+.dropdown-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.2s ease;
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+.dropdown-icon.rotate {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--card);
+  /* Using CSS variables from global */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 99999;
+  list-style: none;
+  /* Remove default list style */
+  padding: 0;
+  margin: 0.25rem 0 0 0;
+}
+
+.dropdown-list li {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.main-text {
+  font-size: 0.95rem;
+  color: var(--foreground);
+}
+
+.sub-text {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.15rem;
+}
+
+.check-icon {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.dropdown-list li:hover,
+.dropdown-list li.selected,
+.dropdown-list li.focused {
+  background-color: var(--secondary);
+  /* Highlight color */
+}
+
+.no-result {
+  color: var(--muted-foreground);
+  text-align: center;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Floating Label Logic mimicking global styles */
+/* The global style uses `input:focus + label` or we rely on `has-value` class */
+label {
+  /* Ensure label floats if input has value (handled via class.has-value) */
+  /* Or if input is focused (default CSS behavior) */
+  pointer-events: none;
+  /* Make clicks pass through */
+  transition: 0.2s ease all;
+}
+
+label.has-value,
+input:focus ~ label {
+  top: -0.625rem;
+  left: 0.625rem;
+  font-size: 0.8rem;
+  /* Smaller font when floating */
+  color: var(--muted-foreground);
+  /* Unfocused resting color */
+  background: var(--background);
+  /* Match background to hide line behind */
+  padding: 0 0.25rem;
+}
+
+input:focus ~ label {
+  color: var(--primary);
+  /* Use primary color ONLY when active */
+}

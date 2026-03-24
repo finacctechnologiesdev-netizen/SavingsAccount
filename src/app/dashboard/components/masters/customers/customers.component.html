@@ -1,0 +1,15 @@
+<div class="table-outer">
+  <div class="table-header">
+    <h2>Customers List</h2>
+    <button (click)="createNew()" class="btn create-new-btn">
+      <i class="bx bx-plus"></i>
+      Create New
+    </button>
+  </div>
+  <div>
+    <app-tableview [DataSource]="DataSource()" [FieldNames]="FieldNames()" [PrimaryKey]="'PartySno'"
+      (actionEvent)="handleAction($event)" [RowsPerPage]="10" [EnableDateSelection]="false" [EnableCheckbox]="false"
+      [EnablePrint]="false" [EnableMail]="false"></app-tableview>
+  </div>
+</div>
+<router-outlet></router-outlet>

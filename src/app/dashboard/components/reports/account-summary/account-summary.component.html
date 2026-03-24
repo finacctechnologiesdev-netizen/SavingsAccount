@@ -1,0 +1,294 @@
+<div class="table-outer">
+    <div class="table-header summary-header">
+        <h2>Account Summary</h2>
+    </div>
+
+    <!-- Dropdown Section -->
+    <div class="dropdown-section">
+        <span class="dropdown-label">Account:</span>
+        <div class="dropdown-wrapper">
+            <app-searchable-dropdown [options]="accountsList" displayKey="Account_No" subDisplayKey="CustomerMobile"
+                subDisplayIcon="bx bx-phone" valueKey="RdAccountSno" [(ngModel)]="selectedRdAccountSno"
+                (ngModelChange)="onAccountSelected()" placeholder="Select an account"
+                containerClass="account-summary-dropdown">
+            </app-searchable-dropdown>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="form-main-content">
+        <!-- Details Split View -->
+        <div class="details-split-view">
+            <!-- LEFT COLUMN (50%) -->
+            <div class="form-left-col">
+                <div class="details-card">
+                    <h6 class="group-label">Customer Details</h6>
+
+                    @if (selectedCustomer) {
+                    <div class="customer-details-container">
+                        <!-- Top Row: Image & Info -->
+                        <div class="customer-image-row">
+                            <div class="customer-image-placeholder">
+                                @if (selectedCustomer.ProfileImage) {
+                                <img [src]="selectedCustomer.ProfileImage" alt="Profile" />
+                                } @else {
+                                <i class="bx bxs-user"></i>
+                                }
+                            </div>
+                            <div class="customer-info">
+                                <h4 class="customer-name">
+                                    {{ selectedCustomer.Party_Name }}
+                                    <span class="customer-code">({{ selectedCustomer.Party_Code }})</span>
+                                </h4>
+                                <p class="customer-detail">
+                                    {{ selectedCustomer.Address1 || "No address" }}
+                                    @if (selectedCustomer.City) {
+                                    <span>, {{ selectedCustomer.City }}</span>
+                                    }
+                                </p>
+                                <p class="customer-detail">
+                                    <i class="bx bx-phone"></i>
+                                    {{ selectedCustomer.Phone || "N/A" }}
+                                    <span class="separator">|</span>
+                                    <i class="bx bx-mobile"></i>
+                                    {{ selectedCustomer.Mobile || "N/A" }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Stats Row: Badges -->
+                        <div class="stats-row-container">
+                            <div class="stats-row">
+                                <div class="stat-card border-success">
+                                    <span class="stat-label">Live</span>
+                                    <span class="stat-value text-success">{{
+                                        $any(selectedCustomer).OpenLoans || 0
+                                        }}</span>
+                                </div>
+                                <div class="stat-card border-muted">
+                                    <span class="stat-label">Closed</span>
+                                    <span class="stat-value text-muted">{{
+                                        $any(selectedCustomer).ClosedLoans || 0
+                                        }}</span>
+                                </div>
+                                <div class="stat-card border-danger">
+                                    <span class="stat-label">Matured</span>
+                                    <span class="stat-value text-danger">{{
+                                        $any(selectedCustomer).MaturedLoans || 0
+                                        }}</span>
+                                </div>
+                                <div class="stat-card border-auctioned">
+                                    <span class="stat-label">Foreclosed</span>
+                                    <span class="stat-value text-auctioned">{{
+                                        $any(selectedCustomer).AuctionedLoans || 0
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Customer Extended Fields compact -->
+                        <div class="info-row">
+                            <div class="info-item">
+                                <span class="info-label">Aadhar / PAN</span>
+                                <span class="info-value">{{ selectedCustomer.Aadhar_No || "--" }} /
+                                    {{ selectedCustomer.Pancard_No || "--" }}</span>
+                            </div>
+                            <div class="info-item text-right">
+                                <span class="info-label">Acc No / IFSC</span>
+                                <span class="info-value">{{ selectedCustomer.Bank_AccountNo || "--" }} /
+                                    {{ selectedCustomer.Bank_Ifsc || "--" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="empty-state">
+                        <i class="bx bx-user-circle"></i>
+                        <p>Select an account to view details</p>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN (50%) -->
+            <div class="form-right-col">
+                <div class="details-card account-card account-details-card">
+                    <h6 class="group-label account-summary-label" style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            ">
+                        Account Summary Details
+                        @if (accountSummaryItem) {
+                        <span class="text-primary" style="
+                  cursor: pointer;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 0.25rem;
+                  font-size: 0.85rem;
+                  text-transform: none;
+                  font-weight: 600;
+                " (click)="editAccount(accountSummaryItem)">
+                            <i class="bx bx-edit-alt" style="font-size: 1.1rem"></i> Edit
+                        </span>
+                        }
+                    </h6>
+
+                    @if (accountSummaryItem && selectedAccount) {
+                    <!-- Top Tab Navigation -->
+                    <div class="tab-header-nav">
+                        <div class="tab" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+                            Account Overview
+                        </div>
+                        <div class="tab" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+                            General Details
+                        </div>
+                        <!-- <div class="tab" [class.active]="activeTab === 'items'" (click)="activeTab = 'items'">Item
+                            Details</div>
+                        <div class="tab" [class.active]="activeTab === 'followups'" (click)="activeTab = 'followups'">
+                            FollowUps</div> -->
+                    </div>
+
+                    <!-- Account Overview Tab Content -->
+                    <div class="tab-content" *ngIf="activeTab === 'overview'">
+                        <div class="overview-body">
+                            <div class="overview-header-row">
+                                <div>
+                                    <h3 class="account-title">
+                                        {{ accountSummaryItem.Account_No }}
+                                    </h3>
+                                    <div class="account-date">
+                                        <i class="bx bx-calendar text-success"></i> &nbsp;{{
+                                        accountSummaryItem.Account_Date || "--"
+                                        }}
+                                    </div>
+                                    <div class="scheme-name">
+                                        Scheme: {{ accountSummaryItem.RdScheme_Name }}
+                                    </div>
+                                    <div class="dues-text">
+                                        Due Amt:
+                                        <strong><i class="bx bx-rupee"></i>{{
+                                            accountSummaryItem.DueAmount || 0 | number: "1.2-2"
+                                            }}</strong>
+                                        <br />
+                                        Paid Dues:
+                                        <strong>{{ accountSummaryItem.Paid_Dues || 0 }}</strong>
+                                        <br />
+                                        Balance Dues:
+                                        <strong>{{
+                                            accountSummaryItem.Balance_Dues || 0
+                                            }}</strong>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="image-placeholder">
+                                        <i class="bx bx-image-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overview-footer">
+                            <div class="balance-amount">
+                                Balance Amt :
+                                <strong><i class="bx bx-rupee"></i>{{
+                                    accountSummaryItem.Balance_Amount || 0 | number: "1.2-2"
+                                    }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- General Details Tab Content -->
+                    <div class="tab-content default-padding" *ngIf="activeTab === 'general'">
+                        <div class="scheme-info-section">
+                            <div class="info-row">
+                                <div class="info-item">
+                                    <span class="info-label">Total Paid Amount</span>
+                                    <span class="info-value text-success"><i class="bx bx-rupee"></i>{{
+                                        accountSummaryItem.Paid_Amount || 0 | number: "1.2-2"
+                                        }}</span>
+                                </div>
+                                <div class="info-item text-right">
+                                    <span class="info-label">Total Pending Amount</span>
+                                    <span class="info-value text-danger"><i class="bx bx-rupee"></i>{{
+                                        accountSummaryItem.Pending_Amount || 0 | number: "1.2-2"
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-item">
+                                    <span class="info-label">Maturity Date</span>
+                                    <span class="info-value text-primary">{{
+                                        accountSummaryItem.Mature_Date || "N/A"
+                                        }}</span>
+                                </div>
+                                <div class="info-item text-right">
+                                    <span class="info-label">Maturity Amount</span>
+                                    <span class="info-value text-primary font-bold"><i class="bx bx-rupee"></i>{{
+                                        accountSummaryItem.Maturity_Amount || 0
+                                        | number: "1.2-2"
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content default-padding" *ngIf="activeTab === 'items' || activeTab === 'followups'">
+                        <div class="empty-state empty-state-no-bg">
+                            <p>No details available for this section.</p>
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="empty-state">
+                        <i class="bx bx-file"></i>
+                        <p>Select an account to view summary details</p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="receipts-section">
+            <div class="details-card table-card table-wrapper">
+                <h6 class="group-label">Account Receipts</h6>
+
+                @if (selectedAccount && receiptsDataSource().length > 0) {
+                <div class="native-table-container min-h-300">
+                    <table class="native-data-table">
+                        <thead>
+                            <tr>
+                                <th>Receipt No.</th>
+                                <th>Receipt Date</th>
+                                <th class="text-right">Due Count</th>
+                                <th class="text-right">Amount</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (row of receiptsDataSource(); track row.RdReceiptSno) {
+                            <tr>
+                                <td class="fw-bold">{{ row.Receipt_No }}</td>
+                                <td>{{ row.Receipt_Date }}</td>
+                                <td class="text-right">{{ row.DueCount }}</td>
+                                <td class="text-right fw-bold text-success">
+                                    <i class="bx bx-rupee"></i>{{ row.Amount || 0 | number: "1.2-2" }}
+                                </td>
+                                <td>{{ row.Remarks || "--" }}</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                } @else if (selectedAccount) {
+                <div class="empty-state">
+                    <i class="bx bx-receipt"></i>
+                    <p>No receipts found for this account</p>
+                </div>
+                } @else {
+                <div class="empty-state">
+                    <i class="bx bx-receipt"></i>
+                    <p>Select an account to view receipts</p>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

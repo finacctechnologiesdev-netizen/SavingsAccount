@@ -1,0 +1,160 @@
+<div class="drawer-overlay">
+  <div class="drawer-panel" (click)="$event.stopPropagation()">
+    <header class="drawer-header">
+      <h2>{{ isEditMode ? "Edit Account Type" : "Create New Account Type" }}</h2>
+      <button type="button" class="close-btn" (click)="cancelAcType()">
+        <i class="bx bx-x"></i>
+      </button>
+    </header>
+
+    <div class="drawer-body">
+      <form #acTypeForm="ngForm">
+        <!-- Group 1 -->
+        <h6 class="group-label">Account Type Details</h6>
+
+        <div class="row-flex">
+          <div class="input-container w-50">
+            <input
+              type="text"
+              id="AcType_Code"
+              name="AcType_Code"
+              [(ngModel)]="AcType.AcType_Code"
+              [disabled]="isAcTypeCodeDisabled"
+              [class.disabled-input]="isAcTypeCodeDisabled"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['AcType_Code']"
+              placeholder=" "
+              maxlength="10"
+            />
+            <label for="AcType_Code">AcType Code <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["AcType_Code"]) {
+              <span class="error-msg">{{ errors["AcType_Code"] }}</span>
+            }
+          </div>
+
+          <div class="input-container w-50">
+            <input
+              type="text"
+              id="AcType_Name"
+              name="AcType_Name"
+              [(ngModel)]="AcType.AcType_Name"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['AcType_Name']"
+              placeholder=" "
+            />
+            <label for="AcType_Name">AcType Name <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["AcType_Name"]) {
+              <span class="error-msg">{{ errors["AcType_Name"] }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="row-flex">
+          <div class="input-container w-50">
+            <input
+              type="number"
+              id="Min_Balance"
+              name="Min_Balance"
+              [(ngModel)]="AcType.Min_Balance"
+              appInputBehavior
+              [minVal]="0"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['Min_Balance']"
+              placeholder=" "
+            />
+            <label for="Min_Balance">Min Balance <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["Min_Balance"]) {
+              <span class="error-msg">{{ errors["Min_Balance"] }}</span>
+            }
+          </div>
+
+          <div class="input-container w-50">
+            <input
+              type="number"
+              id="Roi"
+              name="Roi"
+              [(ngModel)]="AcType.Roi"
+              appInputBehavior
+              [minVal]="0"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['Roi']"
+              placeholder=" "
+            />
+            <label for="Roi">Rate of Interest (%) <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["Roi"]) {
+              <span class="error-msg">{{ errors["Roi"] }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="row-flex">
+          <div class="input-container w-50">
+            <select
+              id="Ac_Category"
+              name="Ac_Category"
+              [(ngModel)]="AcType.Ac_Category"
+              (blur)="submitCount > 0 ? validateFields() : null"
+              [class.error]="submitCount > 0 && errors['Ac_Category']"
+            >
+              <option [ngValue]="1">Savings</option>
+              <option [ngValue]="2">Current</option>
+            </select>
+            <label for="Ac_Category">Category</label>
+            @if (submitCount > 0 && errors["Ac_Category"]) {
+              <span class="error-msg">{{ errors["Ac_Category"] }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="row-flex">
+          <div class="input-container w-100">
+            <textarea id="Remarks" name="Remarks" [(ngModel)]="AcType.Remarks" placeholder=" "
+              style="height: 6rem; resize: none;"></textarea>
+            <label for="Remarks">Remarks</label>
+          </div>
+        </div>
+
+        @if (isEditMode) {
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input
+                type="date"
+                id="CreateDate"
+                name="CreateDate"
+                [ngModel]="AcType.CreateDate"
+                placeholder=" "
+                disabled
+              />
+              <label for="CreateDate">Create Date</label>
+            </div>
+          </div>
+        }
+
+        <hr class="group-divider" />
+        <h6 class="group-label">Properties</h6>
+        <div class="row-flex flex-col">
+          <div class="toggle-wrapper w-100">
+            <span class="status-label">Status:</span>
+            <label class="switch">
+              <input
+                type="checkbox"
+                name="IsActive"
+                [ngModel]="AcType.IsActive === 1"
+                (ngModelChange)="AcType.IsActive = $event ? 1 : 0"
+              />
+              <span class="slider"></span>
+            </label>
+            <span class="status-text">{{ AcType.IsActive === 1 ? "Active" : "Inactive" }}</span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <footer class="drawer-footer">
+      <button type="button" class="btn-save-drawer" (click)="saveAcType()">
+        <i class="bx bx-save"></i> {{ isEditMode ? "Update" : "Save" }}
+      </button>
+    </footer>
+  </div>
+</div>
+`

@@ -1,0 +1,69 @@
+<!-- The Checkbox Hack -->
+<input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-checkbox" #sidebarToggle />
+
+<!-- Mobile Backdrop - Moved outside to escape transform context & fix layering -->
+<label for="sidebar-toggle" class="backdrop"></label>
+
+<div class="sidebar-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-wrapper">
+        <img src="assets/images/finacclogo.png" alt="FinAcc Logo" class="logo-img" />
+        <span class="logo-text">FinAcc</span>
+      </div>
+      <button class="mobile-close-btn" (click)="closeSidebar()">
+        <i class="bx bx-x"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" [class.disabled-nav]="!isCompanySelected">
+      <ul>
+        @for (item of menuItems; track item.label) {
+        @if (!item.children) {
+        <li class="nav-item-wrapper" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a [routerLink]="item.route" (click)="expandSidebar()">
+            <div class="icon-wrapper">
+              <i [class]="item.icon"></i>
+            </div>
+            <!-- Text hidden when collapsed -->
+            <span class="text">{{ item.label }}</span>
+            <!-- Tooltip for collapsed state could be added here -->
+          </a>
+        </li>
+        } @else {
+        <!-- Submenu -->
+        <li class="nav-item-wrapper" [class.open]="expandedMenu === item.id">
+          <button (click)="toggleSubmenu(item.id)" class="dropdown-trigger">
+            <div class="icon-wrapper">
+              <i [class]="item.icon"></i>
+            </div>
+            <span class="text">{{ item.label }}</span>
+            <i class="bx bx-chevron-down chevron"></i>
+          </button>
+
+          <ul class="submenu">
+            @for (sub of item.children; track sub.label) {
+            <li>
+              <a [routerLink]="sub.route" routerLinkActive="active-sub">
+                <!-- <i [class]="sub.icon"></i> -->
+                <span>{{ sub.label }}</span>
+              </a>
+            </li>
+            }
+          </ul>
+        </li>
+        }
+        }
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="dropdown-divider"></div>
+
+      <div class="support-btn">
+        <!-- <span class="material-symbols-outlined">support_agent</span> -->
+        <i class="bx bx-phone" style="font-size: 1.35rem;"></i>
+        <span class="text">Support</span>
+      </div>
+    </div>
+  </aside>
+</div>

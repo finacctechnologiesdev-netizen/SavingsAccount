@@ -1,0 +1,12 @@
+<div class="table-outer">
+    <div class="table-header summary-header">
+        <h2>Pending Report</h2>
+    </div>
+    <div>
+        <app-tableview [DataSource]="DataSource()" [FieldNames]="FieldNames()" [PrimaryKey]="'RdAccountSno'"
+            (actionEvent)="handleAction($event)" [RowsPerPage]="10" [EnableDateSelection]="false"
+            [EnablePendingDues]="true" [PendingDues]="pendingDues" [EnableCheckbox]="false" [EnablePrint]="false"
+            [EnableMail]="false">
+        </app-tableview>
+    </div>
+</div>

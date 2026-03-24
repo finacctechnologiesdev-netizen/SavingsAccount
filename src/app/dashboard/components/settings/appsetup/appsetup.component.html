@@ -1,0 +1,98 @@
+<div class="form-viewport">
+
+  <!-- Header: only Update button -->
+  <header class="form-header-slim">
+    <div class="header-info">
+      <h2>App Setup</h2>
+    </div>
+    <div class="header-actions">
+      <button (click)="updateSetup()" type="button" class="btn-save" [disabled]="isSaving">
+        @if (isSaving) {
+          <i class="bx bx-loader-alt bx-spin"></i>
+          Updating...
+        } @else {
+          <i class="bx bx-save"></i>
+          Update
+        }
+      </button>
+    </div>
+  </header>
+
+  <!-- Form — always editable, populated from API on load -->
+  @if (Setup) {
+    <div class="form-scroll-content">
+      <form class="clean-form-layout">
+
+        <!-- Scheme Code Configuration -->
+        <div class="form-section no-border">
+          <h6 class="group-label">Scheme Code Configuration</h6>
+          <div class="form-row">
+
+            <!-- Auto Generate -->
+            <div class="input-container w-180">
+              <select
+                id="SchemeCode_AutoGen"
+                name="SchemeCode_AutoGen"
+                [(ngModel)]="Setup.SchemeCode_AutoGen">
+                <option [ngValue]="0">Manual</option>
+                <option [ngValue]="1">Auto Generate</option>
+              </select>
+              <label for="SchemeCode_AutoGen">Auto Generate</label>
+            </div>
+
+            <!-- Scheme Prefix -->
+            <div class="input-container w-180">
+              <input
+                type="text"
+                id="SchemeCode_Prefix"
+                name="SchemeCode_Prefix"
+                [(ngModel)]="Setup.SchemeCode_Prefix"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['SchemeCode_Prefix']"
+                placeholder=" " />
+              <label for="SchemeCode_Prefix">Scheme Prefix <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['SchemeCode_Prefix']) {
+                <span class="error-msg">{{ errors['SchemeCode_Prefix'] }}</span>
+              }
+            </div>
+
+            <!-- Current No -->
+            <div class="input-container w-160">
+              <input
+                type="number"
+                id="SchemeCode_CurrentNo"
+                name="SchemeCode_CurrentNo"
+                [(ngModel)]="Setup.SchemeCode_CurrentNo"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['SchemeCode_CurrentNo']"
+                placeholder=" " />
+              <label for="SchemeCode_CurrentNo">Current No <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['SchemeCode_CurrentNo']) {
+                <span class="error-msg">{{ errors['SchemeCode_CurrentNo'] }}</span>
+              }
+            </div>
+
+            <!-- Code Width -->
+            <div class="input-container w-130">
+              <input
+                type="number"
+                id="SchemeCode_Width"
+                name="SchemeCode_Width"
+                [(ngModel)]="Setup.SchemeCode_Width"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['SchemeCode_Width']"
+                placeholder=" " />
+              <label for="SchemeCode_Width">Code Width <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['SchemeCode_Width']) {
+                <span class="error-msg">{{ errors['SchemeCode_Width'] }}</span>
+              }
+            </div>
+
+          </div>
+        </div>
+
+      </form>
+    </div>
+  }
+
+</div>

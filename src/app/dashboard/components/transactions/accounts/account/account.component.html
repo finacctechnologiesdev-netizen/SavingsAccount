@@ -1,0 +1,354 @@
+<div class="form-viewport">
+  <header class="form-header-slim">
+    <div class="header-info">
+      <h2>{{ isEditMode ? "Edit RD Account" : "Create New RD Account" }}</h2>
+    </div>
+    <div class="header-actions">
+      <button (click)="cancelAccount()" type="button" class="btn-cancel">
+        <i class="bx bx-x"></i>
+        Cancel
+      </button>
+      <button (click)="saveAccount()" type="button" class="btn-save">
+        <i class="bx bx-save"></i>
+        {{ isEditMode ? "Update" : "Save" }}
+      </button>
+    </div>
+  </header>
+
+  <div class="form-main-layout">
+    <form>
+      <div class="row-flex align-start">
+        <!-- LEFT COLUMN (50%) -->
+        <div class="w-50 form-left-col">
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <select
+                id="SeriesSno"
+                name="SeriesSno"
+                [(ngModel)]="Account.SeriesSno"
+                (change)="onSeriesChange()"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['SeriesSno']"
+              >
+                <option [ngValue]="0" disabled>Select Series</option>
+                @for (series of seriesList; track series.SeriesSno) {
+                  <option [ngValue]="series.SeriesSno">
+                    {{ series.Series_Name }}
+                  </option>
+                }
+              </select>
+              <label for="SeriesSno">Series <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["SeriesSno"]) {
+                <span class="error-msg">{{ errors["SeriesSno"] }}</span>
+              }
+            </div>
+
+            <div class="input-container w-50">
+              <input
+                type="text"
+                id="Reference"
+                name="Reference"
+                [(ngModel)]="Account.Reference"
+                placeholder=" "
+              />
+              <label for="Reference">Reference</label>
+            </div>
+          </div>
+
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <input
+                type="date"
+                id="Account_Date"
+                name="Account_Date"
+                [(ngModel)]="Account.Account_Date"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Account_Date']"
+                placeholder=" "
+              />
+              <label for="Account_Date"
+                >Account Date <span class="req">*</span></label
+              >
+              @if (submitCount > 0 && errors["Account_Date"]) {
+                <span class="error-msg">{{ errors["Account_Date"] }}</span>
+              }
+            </div>
+
+            <!-- <div class="input-container w-50">
+              <select id="IsActive" name="IsActive" [(ngModel)]="Account.IsActive">
+                <option [ngValue]="1">Active</option>
+                <option [ngValue]="0">Inactive</option>
+              </select>
+              <label for="IsActive">Status</label>
+            </div> -->
+
+            <div class="input-container w-50">
+              <input
+                type="text"
+                id="Account_No"
+                name="Account_No"
+                [(ngModel)]="Account.Account_No"
+                [disabled]="isAccountNoDisabled"
+                [class.disabled-input]="isAccountNoDisabled"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Account_No']"
+                placeholder=" "
+                (keypress)="
+                  this.globals.checklength10(
+                    $event,
+                    'Account No should be 10 characters'
+                  )
+                "
+                maxlength="10"
+              />
+              <label for="Account_No"
+                >Account No <span class="req">*</span></label
+              >
+              @if (submitCount > 0 && errors["Account_No"]) {
+                <span class="error-msg">{{ errors["Account_No"] }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="input-container w-100" style="position: relative; margin-bottom: 1rem">
+            <app-selectionlist
+              [DataSource]="customersForDropdown"
+              Caption="Customer *"
+              [SelectedItem]="selectedCustomerForDropdown"
+              (newItemEvent)="onCustomerSelected($event)"
+            ></app-selectionlist>
+            @if (submitCount > 0 && errors['PartySno']) {
+              <span class="error-msg" style="right: 2.5rem">{{ errors['PartySno'] }}</span>
+            }
+          </div>
+
+          <div class="row-flex mb-0">
+            <div class="input-container w-50">
+              <select
+                id="SchemeFrequency"
+                name="SchemeFrequency"
+                [(ngModel)]="selectedFrequency"
+                (change)="onFrequencyChange()"
+              >
+                <option [ngValue]="0" disabled>Select Frequency</option>
+                @for (freq of frequencies; track freq.value) {
+                  <option [ngValue]="freq.value">
+                    {{ freq.label }}
+                  </option>
+                }
+              </select>
+              <label for="SchemeFrequency"
+                >Frequency <span class="req">*</span></label
+              >
+            </div>
+
+            <div class="input-container w-50" style="position: relative">
+              @if (!selectedFrequency) {
+                <input
+                  type="text"
+                  [disabled]="true"
+                  placeholder="Select frequency to select schemes"
+                  class="disabled-input"
+                />
+                <label>Scheme <span class="req">*</span></label>
+              } @else if (filteredSchemesForDropdown.length === 0) {
+                <input
+                  type="text"
+                  [disabled]="true"
+                  placeholder="No schemes found with this frequency"
+                  class="disabled-input"
+                />
+                <label>Scheme <span class="req">*</span></label>
+              } @else {
+                <!-- Uses SelectionlistComponent mapped to filteredSchemesForDropdown -->
+                <app-selectionlist
+                  [DataSource]="filteredSchemesForDropdown"
+                  Caption="Scheme *"
+                  [SelectedItem]="selectedSchemeForDropdown"
+                  (newItemEvent)="onSchemeSelected($event)"
+                ></app-selectionlist>
+              }
+
+              @if (submitCount > 0 && errors["RdSchemeSno"]) {
+                <span
+                  class="error-msg"
+                  [ngStyle]="
+                    selectedFrequency && filteredSchemesForDropdown.length > 0
+                      ? { right: '2.5rem' }
+                      : null
+                  "
+                  >{{ errors["RdSchemeSno"] }}</span
+                >
+              }
+            </div>
+          </div>
+
+          <div class="input-container w-100">
+            <textarea
+              id="Remarks"
+              name="Remarks"
+              [(ngModel)]="Account.Remarks"
+              placeholder=" "
+              class="remarks-field"
+            ></textarea>
+            <label for="Remarks">Remarks</label>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN (50%) -->
+        <div class="w-50 form-right-col">
+          <!-- Top 50% Section: Customer Details & Badges -->
+          <div class="details-card">
+            <h6 class="group-label">Customer Details</h6>
+
+            @if (selectedCustomer) {
+              <div class="customer-details-container">
+                <!-- Top Row: Image & Info -->
+                <div class="customer-image-row">
+                  <div class="customer-image-placeholder">
+                    @if (selectedCustomer.ProfileImage) {
+                      <img
+                        [src]="selectedCustomer.ProfileImage"
+                        alt="Profile"
+                      />
+                    } @else {
+                      <i class="bx bxs-user"></i>
+                    }
+                  </div>
+                  <div class="customer-info">
+                    <h4 class="customer-name">
+                      {{ selectedCustomer.Party_Name }}
+                    </h4>
+                    <p class="customer-detail">
+                      {{ selectedCustomer.Address1 || "No address" }}
+                    </p>
+                    <p class="customer-detail">
+                      <i class="bx bx-phone"></i>
+                      {{ selectedCustomer.Phone || "N/A" }}
+                    </p>
+                    <p class="customer-detail">
+                      <i class="bx bx-mobile"></i>
+                      {{ selectedCustomer.Mobile || "N/A" }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Stats Row: Badges -->
+                <div class="stats-row">
+                  <div class="stat-card border-success">
+                    <span class="stat-label">Live</span>
+                    <span class="stat-value text-success">{{
+                      $any(selectedCustomer).OpenLoans
+                    }}</span>
+                  </div>
+                  <div class="stat-card border-muted">
+                    <span class="stat-label">Closed</span>
+                    <span class="stat-value text-muted">{{
+                      $any(selectedCustomer).ClosedLoans
+                    }}</span>
+                  </div>
+                  <div class="stat-card border-danger">
+                    <span class="stat-label">Matured</span>
+                    <span class="stat-value text-danger">{{
+                      $any(selectedCustomer).MaturedLoans || 0
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="empty-state">
+                <i class="bx bx-user-circle"></i>
+                <p>Select a customer to view details</p>
+              </div>
+            }
+          </div>
+
+          <!-- Bottom 50% Section: Scheme Details & Maturity Calculations -->
+          <div class="details-card">
+            <h6 class="group-label">Scheme Details</h6>
+
+            @if (selectedScheme) {
+              <div class="scheme-details-container">
+                <!-- Scheme Information -->
+                <div class="scheme-info-section">
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Scheme Name</span>
+                      <span class="info-value">{{
+                        selectedScheme.RdScheme_Name
+                      }}</span>
+                    </div>
+                    <!-- <div class="info-item text-right">
+                      <span class="info-label">Due Period</span>
+                      <span class="info-value"
+                        >  {{ selectedScheme.Due_Period }}
+                      </span>
+                    </div> -->
+                  </div>
+
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Due Amount</span>
+                      <span class="info-value"
+                        ><i class="bx bx-rupee"></i
+                        >{{ selectedScheme.DueAmount }}</span
+                      >
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Due Frequency</span>
+                      <span class="info-value">{{
+                        getFrequencyLabel(selectedScheme.Due_Frequency)
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div class="info-row no-border-bottom">
+                    <div class="info-item">
+                      <span class="info-label">Rate of Interest</span>
+                      <span class="info-value">{{ selectedScheme.Roi }}%</span>
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Default Charges</span>
+                      <span class="info-value"
+                        ><i class="bx bx-rupee"></i
+                        >{{ selectedScheme.Default_Charges }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Maturity Calculation -->
+                <div class="maturity-block">
+                  <div class="info-row maturity-row">
+                    <span class="maturity-label">Maturity Amount</span>
+                    <span class="maturity-value amount"
+                      ><i class="bx bx-rupee"></i
+                      >{{ selectedScheme.Maturity_Amount || 0 }}</span
+                    >
+                  </div>
+                  <div class="info-row maturity-row maturity-row-top">
+                    <span class="maturity-label">Maturity Date</span>
+                    <span class="maturity-value date">{{
+                      Account.Mature_Date || "N/A"
+                    }}</span>
+                  </div>
+                  <div class="info-row maturity-row maturity-row-top">
+                    <span class="maturity-label">Installment Date</span>
+                    <span class="maturity-value date">{{
+                      instDate || "N/A"
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="empty-state">
+                <i class="bx bx-list-ul"></i>
+                <p>Select a scheme to view details</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

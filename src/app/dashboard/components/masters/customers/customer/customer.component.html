@@ -1,0 +1,341 @@
+<div class="drawer-overlay">
+  <div class="drawer-panel" (click)="$event.stopPropagation()">
+    <header class="drawer-header">
+      <h2>{{ isEditMode ? 'Edit Customer' : 'Customers' }}</h2>
+      <button type="button" class="close-btn" (click)="cancelCustomer()"><i class="bx bx-x"></i></button>
+    </header>
+
+    <div class="drawer-body">
+      <form #customerForm="ngForm">
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="d-none" />
+        <!-- Top Section -->
+        <div class="top-section">
+          <div class="image-area">
+            <div class="image-placeholder">
+              @if(Customer.ProfileImage) {
+              <img [src]="Customer.ProfileImage" class="profile-preview-img" />
+              } @else {
+              <i class="bx bxs-image"></i>
+              }
+            </div>
+            <div class="image-actions">
+              <button type="button" class="action-btn"><i
+                  class="bx bx-webcam color-success"></i><span>WebCam</span></button>
+              <button type="button" class="action-btn" (click)="fileInput.click()"><i
+                  class="bx bxs-file-find color-primary"></i><span>Browse</span></button>
+              <button type="button" class="action-btn" (click)="removeImage()"><i
+                  class="bx bx-trash color-danger"></i><span>Remove</span></button>
+              <button type="button" class="action-btn" (click)="fileInput.click()"><i
+                  class="bx bx-images color-dark"></i><span>More Images</span></button>
+            </div>
+          </div>
+
+          <div class="top-fields">
+
+            <div class="input-container w-100">
+              <input type="text" id="Party_Code" name="Party_Code" [(ngModel)]="Customer.Party_Code"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Party_Code']" placeholder=" " />
+              <label for="Party_Code">Customer Code <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["Party_Code"]) {
+              <span class="error-msg">{{ errors["Party_Code"] }}</span>
+              }
+            </div>
+
+            <div class="input-container w-100">
+              <input type="text" id="Party_Name" name="Party_Name" [(ngModel)]="Customer.Party_Name"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Party_Name']" placeholder=" " />
+              <label for="Party_Name">Customer Name <span class="req">*</span></label>
+              @if (submitCount > 0 && errors["Party_Name"]) {
+              <span class="error-msg">{{ errors["Party_Name"] }}</span>
+              }
+            </div>
+
+            <div class="row-flex mb-0">
+              <div class="input-container w-40">
+                <select id="Rel" name="Rel" [(ngModel)]="Customer.Rel">
+                  <option [ngValue]="0">S/o</option>
+                  <option [ngValue]="1">D/o</option>
+                  <option [ngValue]="2">W/o</option>
+                  <option [ngValue]="3">C/o</option>
+                </select>
+                <label for="Rel">Rel</label>
+              </div>
+              <div class="input-container w-60">
+                <input type="text" id="RelName" name="RelName" [(ngModel)]="Customer.RelName" placeholder=" " />
+                <label for="RelName">Relation Name</label>
+              </div>
+            </div>
+
+            <div class="input-container w-100">
+              <input type="text" id="Mobile" name="Mobile" [(ngModel)]="Customer.Mobile"
+                (keypress)="globals.isNumberKey($event)" (input)="Customer.Mobile = globals.filterNumbers($event)"
+                (blur)="submitCount > 0 ? validateFields() : null" [class.error]="submitCount > 0 && errors['Mobile']"
+                placeholder=" " maxlength="10" />
+              <label for="Mobile">Mobile <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['Mobile']) {
+              <span class="error-msg">{{ errors['Mobile'] }}</span>
+              }
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TABS HEADER -->
+        <div class="tabs-header">
+          <button type="button" class="tab-btn" [class.active]="activeTab === 1" (click)="activeTab = 1">Address
+            Information</button>
+          <button type="button" class="tab-btn" [class.active]="activeTab === 2" (click)="activeTab = 2">Contact
+            Information</button>
+          <button type="button" class="tab-btn" [class.active]="activeTab === 3" (click)="activeTab = 3">Other
+            Information</button>
+          <button type="button" class="tab-btn" [class.active]="activeTab === 4" (click)="activeTab = 4">Bank
+            Details</button>
+        </div>
+
+        <!-- TAB CONTENTS -->
+        <div class="tab-content-area">
+          <!-- Address Info Tab 1-->
+          @if(activeTab === 1) {
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Address1" name="Address1" [(ngModel)]="Customer.Address1" placeholder=" " />
+              <label for="Address1">Address Line 1</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Address2" name="Address2" [(ngModel)]="Customer.Address2" placeholder=" " />
+              <label for="Address2">Address Line 2</label>
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="City" name="City" [(ngModel)]="Customer.City" placeholder=" " />
+              <label for="City">City</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="State" name="State" [(ngModel)]="Customer.State" placeholder=" " />
+              <label for="State">State</label>
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Pincode" name="Pincode" [(ngModel)]="Customer.Pincode" placeholder=" "
+                maxlength="6" (keypress)="globals.isNumberKey($event)"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Pincode']" />
+              <label for="Pincode">Pincode</label>
+              @if (submitCount > 0 && errors['Pincode']) {
+              <span class="error-msg">{{ errors['Pincode'] }}</span>
+              }
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Phone" name="Phone" [(ngModel)]="Customer.Phone" placeholder=" " maxlength="10"
+                (keypress)="globals.isNumberKey($event)" (input)="Customer.Phone = globals.filterNumbers($event)"
+                (blur)="submitCount > 0 ? validateFields() : null" [class.error]="submitCount > 0 && errors['Phone']" />
+              <label for="Phone">Alt Phone</label>
+              @if (submitCount > 0 && errors['Phone']) {
+              <span class="error-msg">{{ errors['Phone'] }}</span>
+              }
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Email" name="Email" [(ngModel)]="Customer.Email" placeholder=" "
+                (blur)="submitCount > 0 ? validateFields() : null" [class.error]="submitCount > 0 && errors['Email']" />
+              <label for="Email">Email</label>
+              @if (submitCount > 0 && errors['Email']) {
+              <span class="error-msg">{{ errors['Email'] }}</span>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Contact Info Tab 2 -->
+          @if(activeTab === 2) {
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Aadhar_No" name="Aadhar_No" [(ngModel)]="Customer.Aadhar_No" placeholder=" "
+                maxlength="12" (keypress)="globals.isNumberKey($event)"
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Aadhar_No']" />
+              <label for="Aadhar_No">Aadhaar No</label>
+              @if (submitCount > 0 && errors['Aadhar_No']) {
+              <span class="error-msg">{{ errors['Aadhar_No'] }}</span>
+              }
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Pancard_No" name="Pancard_No" [(ngModel)]="Customer.Pancard_No" placeholder=" "
+                maxlength="10" style="text-transform: uppercase" (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Pancard_No']" />
+              <label for="Pancard_No">PAN No</label>
+              @if (submitCount > 0 && errors['Pancard_No']) {
+              <span class="error-msg">{{ errors['Pancard_No'] }}</span>
+              }
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Smartcard_No" name="Smartcard_No" [(ngModel)]="Customer.Smartcard_No"
+                placeholder=" " />
+              <label for="Smartcard_No">SmartCard No</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Voterid_No" name="Voterid_No" [(ngModel)]="Customer.Voterid_No" placeholder=" " />
+              <label for="Voterid_No">Voter ID</label>
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Occupation" name="Occupation" [(ngModel)]="Customer.Occupation" placeholder=" " />
+              <label for="Occupation">Occupation</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Nominee" name="Nominee" [(ngModel)]="Customer.Nominee" placeholder=" " />
+              <label for="Nominee">Nominee</label>
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Nominee_Rel" name="Nominee_Rel" [(ngModel)]="Customer.Nominee_Rel"
+                placeholder=" " />
+              <label for="Nominee_Rel">Nominee Relation</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Nominee_Aadhar" name="Nominee_Aadhar" [(ngModel)]="Customer.Nominee_Aadhar"
+                placeholder=" " maxlength="12" (keypress)="globals.isNumberKey($event)"
+                (input)="Customer.Nominee_Aadhar = globals.filterNumbers($event)" />
+              <label for="Nominee_Aadhar">Nominee Aadhar</label>
+              @if(submitCount > 0 && errors['Nominee_Aadhar']) {
+              <span class="error-msg">{{ errors['Nominee_Aadhar'] }}</span>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Other Info Tab 3 -->
+          @if(activeTab === 3) {
+          <div class="row-flex">
+            <div class="w-50">
+
+              <div class="input-container w-100">
+                <select id="Sex" name="Sex" [(ngModel)]="Customer.Sex">
+                  <option [ngValue]="0">Male</option>
+                  <option [ngValue]="1">Female</option>
+                  <option [ngValue]="2">Other</option>
+                </select>
+                <label for="Sex">Gender</label>
+              </div>
+
+              <div class="input-container w-100" [class.error]="submitCount > 0 && errors['Dob']">
+                <input type="date" id="Dob" name="Dob" [(ngModel)]="Customer.Dob" placeholder=" " />
+                <label for="Dob">Date of Birth </label>
+
+                <!-- <span class="req">*</span> -->
+              </div>
+
+              <div class="input-container w-100">
+                <input type="text" id="Reference" name="Reference" [(ngModel)]="Customer.Reference" placeholder=" " />
+                <label for="Reference">Reference</label>
+              </div>
+
+              <div class="toggle-wrapper w-100">
+                <label class="switch">
+                  <input type="checkbox" name="Active_Status_Toggle" [ngModel]="Customer.Active_Status === 1"
+                    (ngModelChange)="Customer.Active_Status = $event ? 1 : 0">
+                  <span class="slider"></span>
+                </label>
+                <span class="status-label">Status: {{
+                  Customer.Active_Status === 1 ? 'Active' : 'Inactive' }}</span>
+              </div>
+
+            </div>
+
+            <div class="w-50">
+              <div class="input-container w-100">
+                <input type="number" id="Monthly_Income" name="Monthly_Income" [(ngModel)]="Customer.Monthly_Income"
+                  placeholder=" " appInputBehavior [decimalPlaces]="0" />
+                <label for="Monthly_Income">Monthly Income</label>
+              </div>
+
+              <div class="row-flex mb-0">
+                <div class="input-container w-50">
+                  <input type="number" id="Loan_Value_Limit" name="Loan_Value_Limit" appInputBehavior [decimalPlaces]="0"
+                    [(ngModel)]="Customer.Loan_Value_Limit" placeholder=" " />
+                  <label for="Loan_Value_Limit">Loan Value Limit</label>
+                </div>
+                <div class="input-container w-50">
+                  <input type="number" id="MaxLoans" name="MaxLoans" [(ngModel)]="Customer.MaxLoans" placeholder=" " />
+                  <label for="MaxLoans">Max Loans</label>
+                </div>
+              </div>
+
+              <div class="input-container w-100">
+                <select id="Allow_More_Value" name="Allow_More_Value" [(ngModel)]="Customer.Allow_More_Value">
+                  <option [ngValue]="1">Yes</option>
+                  <option [ngValue]="0">No</option>
+                </select>
+                <label for="Allow_More_Value">Allow More Value</label>
+              </div>
+
+              @if (isEditMode) {
+              <div class="input-container w-100">
+                <input type="date" id="Create_Date" name="Create_Date" [ngModel]="Customer.Create_Date" disabled
+                  placeholder=" " />
+                <label for="Create_Date">Create Date</label>
+              </div>
+              }
+            </div>
+          </div>
+
+          <div class="row-flex">
+            <div class="input-container w-100">
+              <input type="text" id="Remarks" name="Remarks" [(ngModel)]="Customer.Remarks" placeholder=" " />
+              <label for="Remarks">Remarks</label>
+            </div>
+          </div>
+          }
+
+          <!-- Bank Tab 4 -->
+          @if(activeTab === 4) {
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Bank_AccName" name="Bank_AccName" [(ngModel)]="Customer.Bank_AccName"
+                placeholder=" " />
+              <label for="Bank_AccName">Account Name</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Bank_Name" name="Bank_Name" [(ngModel)]="Customer.Bank_Name" placeholder=" " />
+              <label for="Bank_Name">Bank Name</label>
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Bank_Branch_Name" name="Bank_Branch_Name" [(ngModel)]="Customer.Bank_Branch_Name"
+                placeholder=" " />
+              <label for="Bank_Branch_Name">Branch Name</label>
+            </div>
+            <div class="input-container w-50">
+              <input type="text" id="Bank_AccountNo" name="Bank_AccountNo" [(ngModel)]="Customer.Bank_AccountNo"
+                placeholder=" " />
+              <label for="Bank_AccountNo">Account No</label>
+            </div>
+          </div>
+          <div class="row-flex">
+            <div class="input-container w-50">
+              <input type="text" id="Bank_Ifsc" name="Bank_Ifsc" [(ngModel)]="Customer.Bank_Ifsc" placeholder=" " />
+              <label for="Bank_Ifsc">IFSC Code</label>
+            </div>
+          </div>
+          }
+
+        </div>
+      </form>
+    </div>
+
+    <footer class="drawer-footer">
+      <button type="button" class="btn-save-drawer" (click)="saveCustomer()"><i class='bx bx-save'></i>
+        Save</button>
+    </footer>
+  </div>
+</div>

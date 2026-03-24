@@ -1,0 +1,282 @@
+.company-modal {
+  max-width: 60rem;
+  width: 90%;
+  background-color: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 85vh;
+
+  // Smooth entrance animation
+ animation: companyModalSlideIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+// Overlay fade
+:host {
+  display: contents;
+}
+
+:host ::ng-deep .modal-overlay,
+.modal-overlay {
+  animation: companyOverlayFade 0.25s ease both;
+}
+
+@keyframes companyOverlayFade {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes companyModalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+
+  .title-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    i {
+      font-size: 1.5rem;
+      color: var(--foreground);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+  }
+
+  .close-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--muted-foreground);
+    transition: color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: var(--danger);
+    }
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.p-0 {
+  padding: 0 !important;
+}
+
+/* Modifying standard native table for the company list */
+.native-table-container {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.company-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    background-color: var(--primary); 
+    color: white;
+    text-transform: none; 
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    white-space: nowrap;
+
+    &.text-center {
+      text-align: center;
+    }
+  }
+
+  tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-left 0.2s ease, padding-left 0.2s ease;
+    border-left: 4px solid transparent;
+
+    &:hover {
+      background-color: var(--accent);
+      padding-left: 0.25rem;
+
+      .action-btn {
+        color: var(--primary);
+        background: rgba(245, 158, 11, 0.1);
+      }
+    }
+
+    td {
+      padding: 1rem 1.5rem;
+      color: var(--foreground);
+      font-size: 0.95rem;
+      transition: padding-left 0.2s ease;
+
+      &.fw-bold {
+        font-weight: 600;
+      }
+
+      &.text-muted {
+        color: var(--muted-foreground);
+      }
+
+      &.text-center {
+        text-align: center;
+      }
+    }
+  }
+
+
+  .action-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted-foreground);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    
+    i {
+      font-size: 1.1rem;
+    }
+    
+    &:hover, &:focus {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+  }
+}
+
+/* Column widths */
+.w-10 { width: 10%; }
+.w-15 { width: 15%; }
+.w-25 { width: 25%; }
+.w-40 { width: 40%; }
+
+/* ─── Active Company Row ───────────────────────────── */
+
+.company-table tbody tr.active-row {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-left: 4px solid var(--primary) !important;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+  }
+
+  td {
+    color: var(--foreground);
+    font-weight: 500;
+  }
+}
+
+// Check icon next to company name
+.active-check {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+
+  i {
+    font-size: 1.2rem;
+    color: var(--primary);
+  }
+}
+
+// Company name cell layout
+.company-name-cell {
+  display: flex;
+  align-items: center;
+}
+
+// "Current" badge next to company name
+.current-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+// Status pills
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.9rem;
+  }
+}
+
+.active-pill {
+  background: color-mix(in srgb, var(--color-success, #22c55e) 15%, transparent);
+  color: var(--color-success, #22c55e);
+  border: 1px solid color-mix(in srgb, var(--color-success, #22c55e) 35%, transparent);
+
+  i {
+    animation: pulse-dot 1.8s ease-in-out infinite;
+  }
+}
+
+.inactive-pill {
+  background: var(--accent);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.2); }
+}

@@ -1,0 +1,64 @@
+<div class="table-outer">
+  <div class="table-header">
+    <h2>Recurring Deposit History</h2>
+  </div>
+  <div class="rd-filters-grid">
+    <!-- Open RD Card -->
+    <div class="filter-card card-open" (click)="toggleFilter(1)" [class.active-filter]="activeFilter === 1">
+      <div class="card-content">
+        <div class="card-info">
+          <p class="card-title">Open RD</p>
+          <h3 class="card-amount">₹{{ summaryData.open.amount | number:'1.2-2' }}</h3>
+        </div>
+        <div class="card-badge">
+          <span class="count">{{ summaryData.open.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Closed RD Card -->
+    <div class="filter-card card-closed" (click)="toggleFilter(2)" [class.active-filter]="activeFilter === 2">
+      <div class="card-content">
+        <div class="card-info">
+          <p class="card-title">Closed RD</p>
+          <h3 class="card-amount">₹{{ summaryData.closed.amount | number:'1.2-2' }}</h3>
+        </div>
+        <div class="card-badge">
+          <span class="count">{{ summaryData.closed.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Matured RD Card -->
+    <div class="filter-card card-matured" (click)="toggleFilter(3)" [class.active-filter]="activeFilter === 3">
+      <div class="card-content">
+        <div class="card-info">
+          <p class="card-title">Matured RD</p>
+          <h3 class="card-amount">₹{{ summaryData.matured.amount | number:'1.2-2' }}</h3>
+        </div>
+        <div class="card-badge">
+          <span class="count">{{ summaryData.matured.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auctioned RD Card -->
+    <div class="filter-card card-auctioned" (click)="toggleFilter(4)" [class.active-filter]="activeFilter === 4">
+      <div class="card-content">
+        <div class="card-info">
+          <p class="card-title">Foreclose RD</p>
+          <h3 class="card-amount">₹{{ summaryData.auctioned.amount | number:'1.2-2' }}</h3>
+        </div>
+        <div class="card-badge">
+          <span class="count">{{ summaryData.auctioned.count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <app-tableview [DataSource]="DataSource()" [FieldNames]="FieldNames()" [PrimaryKey]="'RdAccountSno'"
+      (actionEvent)="handleAction($event)" [RowsPerPage]="10" [EnableDateSelection]="true" [FromDate]="fromDate"
+      [ToDate]="toDate" [EnableCheckbox]="false" [EnablePrint]="false" [EnableMail]="false">
+    </app-tableview>
+  </div>
+</div>

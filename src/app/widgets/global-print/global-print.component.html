@@ -1,0 +1,29 @@
+<!-- This section will actually be printed -->
+<div class="print-only">
+  <div class="print-document">
+    <div class="doc-header">
+      <h2>Transaction Details</h2>
+      <p class="company-name">Company Name</p>
+    </div>
+    
+    <div class="doc-content">
+      <table class="data-table">
+        <tbody>
+          @for (key of objectKeys(printData); track key) {
+            <!-- Hide internal Angular/System keys from printing -->
+            @if(key !== 'Action' && key !== 'Index' && printData[key] !== null) {
+              <tr>
+                <th class="key-column">{{ key.replace('_', ' ') }}</th>
+                <td class="val-column">{{ printData[key] }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-footer">
+      <p>System Generated Document</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+// Breakpoints
+$mobile: 48em; // 768px
+$tablet: 64em; // 1024px
+
+@mixin mobile {
+    @media (max-width: $mobile) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: $tablet) {
+        @content;
+    }
+}
+
+// SCSS Helper Variables
+$white: #ffffff;

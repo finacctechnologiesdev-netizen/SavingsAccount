@@ -1,0 +1,51 @@
+<div class="input-container searchable-dropdown" [ngClass]="containerClass">
+  <input
+    type="text"
+    [(ngModel)]="searchText"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (click)="onInputClick()"
+    [placeholder]="placeholder"
+    [disabled]="isDisabled"
+    id="searchDrp"
+    autocomplete="off"
+    [ngClass]="inputClass"
+  />
+  <label for="searchDrp" [class.has-value]="searchText"
+    >{{ label }} <span *ngIf="required" class="req">*</span></label
+  >
+  <i
+    class="bx bx-chevron-down dropdown-icon"
+    (click)="toggleDropdown()"
+    [class.rotate]="isOpen"
+  ></i>
+
+  <ul class="dropdown-list" *ngIf="isOpen && filteredOptions.length > 0">
+    @for (option of filteredOptions; track getValue(option); let i = $index) {
+      <li
+        (click)="selectOption(option)"
+        [class.selected]="isSelected(option)"
+        [class.focused]="i === focusedIndex"
+      >
+        <span *ngIf="multiSelect && isSelected(option)" class="check-icon"
+          >✓</span
+        >
+        <div class="option-content">
+          <div class="main-text">{{ getDisplay(option) }}</div>
+          <div class="sub-text" *ngIf="subDisplayKey && getSubDisplay(option)">
+            <i
+              *ngIf="subDisplayIcon"
+              [class]="subDisplayIcon"
+              style="margin-right: 4px; font-size: 0.8rem"
+            ></i
+            >{{ getSubDisplay(option) }}
+          </div>
+        </div>
+      </li>
+    }
+  </ul>
+
+  <ul class="dropdown-list" *ngIf="isOpen && filteredOptions.length === 0">
+    <li class="no-result">No options found</li>
+  </ul>
+</div>

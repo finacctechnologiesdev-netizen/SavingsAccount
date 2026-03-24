@@ -1,0 +1,74 @@
+<div class="page-container">
+    @if(client) {
+    <div class="profile-card">
+        <div class="card-header">
+            <h2>Client Information</h2>
+        </div>
+        <div class="card-body">
+
+            <div class="info-group">
+                <span class="info-label">Client Code</span>
+                <span class="info-value">{{ client.Client_Code || '-' }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Client Name</span>
+                <span class="info-value">{{ client.Client_Name || '-' }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Address</span>
+                <span class="info-value">{{ client.Address || '-' }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">State</span>
+                <span class="info-value">{{ client.State || '-' }}</span>
+            </div>
+
+            <div class="info-row">
+                <div class="info-group w-50">
+                    <span class="info-label">Mobile</span>
+                    <span class="info-value">{{ client.Mobile || '-' }}</span>
+                </div>
+                <div class="info-group w-50">
+                    <span class="info-label">Alternate Mobile</span>
+                    <span class="info-value">{{ client.Alternate_Mobile || '-' }}</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-group w-50">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ client.Email || '-' }}</span>
+                </div>
+                <div class="info-group w-50">
+                    <span class="info-label">Contact Person</span>
+                    <span class="info-value">{{ client.Contact_Person || '-' }}</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-group w-50">
+                    <span class="info-label">Subscription Start Date</span>
+                    <span class="info-value">{{ formatNumberToDate(client.Subscription_Start) }}</span>
+                </div>
+                <div class="info-group w-50">
+                    <span class="info-label">Subscription End Date</span>
+                    <span class="info-value">{{ formatNumberToDate(client.Subscription_End) }}</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+            <h3>Registered Version: {{ client.Version_Type === 1 ? 'Pro' : (client.Version_Type === 2 ? 'Enterprise' :
+                'Basic') }}</h3>
+        </div>
+    </div>
+    } @else {
+    <div class="no-data">
+        <p>No client information retrieved.</p>
+    </div>
+    }
+</div>

@@ -1,0 +1,249 @@
+/* Error Styling */
+.input-container {
+  margin-bottom: 0rem;
+  width: 100%;
+  position: relative;
+}
+
+.input-container input:focus,
+.input-container select:focus,
+.input-container textarea:focus {
+  border-color: var(--primary);
+}
+
+.error-msg {
+  color: var(--color-danger);
+  font-size: 0.7rem;
+  font-weight: 500;
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+input.error,
+select.error {
+  border-color: var(--color-danger) !important;
+  /* background-color: rgba(239, 68, 68, 0.05); Avoid clash with floating label background */
+
+  &:focus {
+    box-shadow: 0 0 0 0.125rem rgba(239, 68, 68, 0.2);
+  }
+
+  & + label {
+    color: var(--color-danger) !important;
+  }
+}
+/* Disabled Input Styling */
+.disabled-input {
+  cursor: not-allowed !important;
+  background-color: var(--secondary) !important;
+  color: var(--muted-foreground) !important;
+}
+
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  // background-color: var(
+  //   --color-surface-dim,
+  //   #f9fafb
+  // );
+}
+
+/* intPosting Details Components Styles */
+
+.details-card {
+  background: var(--card);
+  border: 0.0625rem solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  border-bottom: 0.0625rem dashed var(--border);
+
+  &.no-border-bottom {
+    border-bottom: none;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+
+  .info-label {
+    font-size: 0.7rem;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .info-value {
+    font-size: 0.95rem;
+    color: var(--foreground);
+    font-weight: 600;
+  }
+}
+
+.text-success {
+  color: #10b981 !important;
+}
+.text-danger {
+  color: #ef4444 !important;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  color: var(--muted-foreground);
+  border: 0.0625rem dashed var(--border);
+  border-radius: 0.5rem;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  &.empty-account {
+    height: calc(100% - 2.5rem);
+  }
+}
+
+/* Layout & Utility Classes */
+.row-flex.align-start {
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+}
+.form-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.form-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+.w-100 {
+  width: 100% !important;
+}
+.text-right {
+  text-align: right;
+}
+
+textarea.remarks-field {
+  height: 6rem;
+  resize: none;
+}
+
+/* Right Column Component Overrides */
+.details-card.account-card {
+  flex: 1.5;
+  min-height: 16rem;
+}
+.details-card.statement-card {
+  flex: 1;
+  min-height: 12rem;
+}
+
+.account-details-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.amount-highlight {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* Statement Classes */
+.statement-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  height: calc(100% - 3rem);
+}
+
+.statement-item {
+  padding-left: 0.85rem;
+
+  &.received {
+    border-left: 0.15rem solid var(--primary);
+  }
+  &.collected {
+    border-left: 0.15rem solid #10b981;
+    margin-top: 0.5rem;
+  }
+}
+
+.statement-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.statement-value {
+  margin: 0.15rem 0 0 0;
+  font-size: 1.25rem;
+  color: var(--foreground);
+  font-weight: 800;
+
+  .statement-date {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    margin-left: 0.25rem;
+  }
+}
+
+.statement-footer {
+  margin-top: auto;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+
+
+

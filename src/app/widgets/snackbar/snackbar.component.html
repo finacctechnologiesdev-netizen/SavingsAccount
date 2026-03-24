@@ -1,0 +1,19 @@
+<div class="container" [ngClass]="data.type">
+    <div class="content">
+        <div class="icon">
+            <i *ngIf="data.type=='info'" class="bx bx-info-circle"></i>
+            <i *ngIf="data.type=='success'" class="bx bx-check-circle"></i>
+            <i *ngIf="data.type=='error'" class="bx bx-error-circle"></i>
+            <i *ngIf="data.type=='delete'" class="bx bx-trash" style="color: #fff"></i>
+        </div>
+
+        <div class="message">
+            {{data.message}}
+        </div>
+
+    </div>
+
+    <div class="closeIcon" (click)="CloseDialog()">
+        &times;
+    </div>
+</div>

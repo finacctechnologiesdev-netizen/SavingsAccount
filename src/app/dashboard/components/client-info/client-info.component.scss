@@ -1,0 +1,93 @@
+@import "../../../../styles.scss";
+
+.page-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.profile-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 0.0625rem solid var(--border);
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.card-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 0.0625rem solid var(--border);
+  background: var(--background);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foreground);
+    letter-spacing: -0.01em;
+  }
+}
+
+.card-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.w-50 {
+  flex: 1;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  .info-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .info-value {
+    font-size: 1.05rem;
+    color: var(--foreground);
+    font-weight: 500;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--border);
+  }
+}
+
+.card-footer {
+  padding: 1.25rem 2rem;
+  background: var(--background);
+  border-top: 0.0625rem solid var(--border);
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+}
+
+.no-data {
+  padding: 3rem;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 1.1rem;
+}

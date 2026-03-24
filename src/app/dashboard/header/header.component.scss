@@ -1,0 +1,303 @@
+/* Header — Premium app bar. All from design system (rem only). */
+
+$header-height: 4rem;
+
+.app-header {
+  height: $header-height;
+  background: var(--color-surface);
+  border-bottom: 0.0625rem solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  width: 100%;
+  z-index: 40;
+  transition: all var(--transition-normal);
+}
+
+.app-header .left-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.app-header .menu-btn,
+.app-header .fullscreen-btn {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  border: 0.0625rem solid var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.app-header .menu-btn i,
+.app-header .fullscreen-btn i {
+  font-size: 1.5rem;
+}
+
+.app-header .menu-btn:hover,
+.app-header .fullscreen-btn:hover {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  transform: translateY(-0.0625rem);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary);
+}
+
+.app-header .right-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.app-header .icon-btn {
+  position: relative;
+  background: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  color: var(--color-muted);
+  cursor: pointer;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+}
+
+.app-header .icon-btn i {
+  font-size: 1.5rem;
+}
+
+.app-header .icon-btn:hover {
+  color: var(--color-primary);
+  transform: translateY(-0.0625rem);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary);
+}
+
+.app-header .icon-btn .badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--color-danger);
+  border-radius: 50%;
+  border: 0.125rem solid var(--color-surface);
+}
+
+
+.app-header .user-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 0.0625rem solid var(--color-border);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+  color: var(--color-muted);
+}
+
+.app-header .user-profile:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-0.0625rem);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.app-header .user-profile .profile-icon {
+  font-size: 1.75rem;
+}
+
+.app-header .profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 13.75rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  z-index: 1000;
+  border: 0.0625rem solid var(--color-border);
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.app-header .profile-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.app-header .profile-dropdown .dropdown-item i {
+  font-size: 1.25rem;
+  color: var(--color-muted);
+  transition: color var(--transition-fast);
+}
+
+.app-header .profile-dropdown .dropdown-item:hover {
+  background: var(--color-hover);
+  color: var(--color-primary);
+}
+
+.app-header .profile-dropdown .dropdown-item:hover i {
+  color: var(--color-primary);
+}
+
+// .app-header .profile-dropdown .dropdown-item.text-danger {
+//   color: var(--color-danger);
+// }
+
+// .app-header .profile-dropdown .dropdown-item.text-danger i {
+//   color: var(--color-danger);
+// }
+
+// .app-header .profile-dropdown .dropdown-item.text-danger:hover {
+//   background: var(--color-danger-bg);
+// }
+
+.app-header .profile-dropdown .dropdown-divider {
+  height: 0.0625rem;
+  background: var(--color-border);
+  margin: 0.25rem 0;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 48rem) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .app-header {
+    padding: 0 var(--space-md);
+    height: 4.375rem;
+  }
+
+  .app-header .right-section .user-info {
+    display: none;
+  }
+}
+
+@media (min-width: 48.0625rem) {
+  .desktop-only {
+    display: flex !important;
+  }
+
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+.text-success{
+  color: var(--color-success);
+}
+
+.branch-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--foreground);
+  transition: all var(--transition-fast);
+  font-family: inherit;
+
+  .company-name {
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--foreground);
+    letter-spacing: -0.01em;
+  }
+
+  i {
+    font-size: 1.25rem;
+    color: var(--muted-foreground);
+    transition: color var(--transition-fast);
+  }
+
+  &:hover {
+    background: transparent;
+    
+    .company-name {
+      color: var(--primary);
+    }
+
+    i.bx-building {
+      color: var(--primary);
+    }
+  }
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1.2rem 0.8rem 1.2rem;
+  width: 100%;
+  border: none;
+  background: var(--color-danger);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.logout-btn i {
+  color: #ffffff;
+  font-size: 1.25rem;
+  margin-right: 1rem;
+  min-width: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.logout-btn:hover {
+  background: var(--color-danger-dark);
+  color: #ffffff;
+  transform: translateY(-0.0625rem);
+  box-shadow: var(--shadow-md);
+}

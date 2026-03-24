@@ -1,0 +1,55 @@
+<header class="app-header">
+  <div class="left-section">
+    <!-- Mobile Toggle -->
+    <div class="menu-btn mobile-only" (click)="toggleSidebar()">
+      <i class="bx bx-menu"></i>
+    </div>
+
+    <!-- Desktop Toggle -->
+    <div class="menu-btn desktop-only" (click)="toggleSidebar()">
+      <i class="bx bx-menu-alt-left"></i>
+    </div>
+
+    <!-- Branch Selection -->
+    <button class="branch-btn" (click)="openCompanySelection()" *ngIf="selectedCompanyName">
+      <span class="company-name">{{ selectedCompanyName }}</span>
+      <i class="bx bx-building"></i>
+    </button>
+  </div>
+
+  <div class="right-section">
+    <button class="icon-btn fullscreen-btn" (click)="toggleFullscreen()" title="Toggle Fullscreen">
+      <i class="bx bx-fullscreen"></i>
+    </button>
+    <button class="icon-btn notification-btn">
+      <i class="bx bx-bell"></i>
+      <span class="badge"></span>
+    </button>
+    <div class="user-profile" (click)="toggleProfileMenu($event)">
+      <i class="bx bxs-user-circle profile-icon"></i>
+      @if (showProfileMenu) {
+      <div class="profile-dropdown">
+        <div class="dropdown-item">
+          <i class="bx bx-user"></i>
+          <span>View Profile</span>
+
+          <!-- (click)="viewProfile()" -->
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+          <i class="bx bx-barcode"></i>
+          <span>Client Code: <br />
+            <span class="text-success">{{ clientCode }}</span></span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+          <button (click)="logout()" class="logout-btn">
+            <i class="bx bx-log-out" style="color: white"></i>
+            <span class="text">Log Out</span>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</header>

@@ -1,0 +1,27 @@
+<div class="table-outer">
+  <div class="table-header">
+    <h2>Savings intPostings List</h2>
+    <button (click)="createNew()" class="btn create-new-btn">
+      <i class="bx bx-plus"></i>
+      Create New
+    </button>
+  </div>
+  <div>
+    <app-tableview
+      [DataSource]="DataSource()"
+      [FieldNames]="FieldNames()"
+      [PrimaryKey]="'PostingSno'"
+      (actionEvent)="handleAction($event)"
+      [RowsPerPage]="10"
+      [EnableDateSelection]="true"
+      [FromDate]="fromDate"
+      [ToDate]="toDate"
+      [EnableCheckbox]="false"
+      [EnablePrint]="true"
+      [EnableMail]="false"
+    ></app-tableview>
+  </div>
+</div>
+
+
+
