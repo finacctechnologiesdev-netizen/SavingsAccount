@@ -41,6 +41,7 @@ export class CustomerComponent implements OnInit {
     } else {
       this.isEditMode = false;
       this.Customer = this.customersService.initializeCustomer();
+      this.Customer.Party_Code = 'Auto';
     }
   }
 
@@ -110,15 +111,15 @@ export class CustomerComponent implements OnInit {
     const payload: any = { ...this.Customer };
     
     // Convert numerical dropdown values explicitly
-    payload.Sex = Number(payload.Sex || 0);
-    payload.Rel = Number(payload.Rel || 0);
+    // payload.Sex = Number(payload.Sex || 0);
+    // payload.Rel = Number(payload.Rel || 0);
 
     // Convert string inputs to safe numbers for API
-    payload.Monthly_Income = Number(payload.Monthly_Income || 0);
-    payload.Loan_Value_Limit = Number(payload.Loan_Value_Limit || 0);
-    payload.MaxLoans = Number(payload.MaxLoans || 0);
-    payload.PartySno = Number(payload.PartySno || 0);
-    payload.AreaSno = Number(payload.AreaSno || 0);
+   // payload.Monthly_Income = Number(payload.Monthly_Income || 0);
+   // payload.Loan_Value_Limit = Number(payload.Loan_Value_Limit || 0);
+    // payload.MaxLoans = Number(payload.MaxLoans || 0);
+    // payload.PartySno = Number(payload.PartySno || 0);
+    // payload.AreaSno = Number(payload.AreaSno || 0);
 
     // Convert booleans
     payload.Active_Status = (payload.Active_Status === true || payload.Active_Status === 1) ? 1 : 0;
@@ -133,36 +134,46 @@ export class CustomerComponent implements OnInit {
       payload.Create_Date = this.globals.ConvertInputDateToApi(payload.Create_Date);
     } else {
       payload.UserSno = 1;
-      payload.CompSno = 1;
+      payload.CompSno = sessionStorage.getItem('CompSno');
       delete payload.CurrentRowVer;
       delete payload.Create_Date;
     }
 
-    this.customersService.crudCustomer(action, payload).subscribe({
+   // console.log("Cust data sending is:",payload);
+    
+
+    this.customersService.crudCustomer(action, payload).subscribe({     
       next: (res: any) => {
+        console.log(payload);
         if (res.Status === 'Success' || res.queryStatus === 1) {
           this.globals.SnackBar('success', this.isEditMode ? 'Customer updated successfully' : 'Customer created successfully');
-          
           if (res.CurrentRowVer) {
              payload.CurrentRowVer = res.CurrentRowVer;
           }
 
           if (this.isEditMode) {
              this.customersService.updateCustomer(payload);
-          } else {
+             this.router.navigate(['dashboard/masters/customers']);
+          } 
+          else {
              if (res.RetSno) {
-               payload.PartySno = res.RetSno; 
-             } else if (res.apiData && typeof res.apiData === 'number') {
-               payload.PartySno = res.apiData;
-             } else if (res.apiData && typeof res.apiData === 'string') {
-               try {
-                 const parsed = JSON.parse(res.apiData);
-                 if (parsed.PartySno) payload.PartySno = parsed.PartySno;
-               } catch(e) {}
+              this.customersService.getCustomer(res.RetSno).subscribe({
+                next: (customerRes: TypeCustomer[]) =>{
+                  this.customersService.addCustomer(customerRes[0]);
+                  this.router.navigate(['dashboard/masters/customers']);
+                },
+                error: (err) => {
+                    console.error("Failed to fetch new customer:", err);
+                    this.customersService.addCustomer(payload);
+                    this.router.navigate(['dashboard/masters/customers']);
+                  }
+              })
              }
-             this.customersService.addCustomer(payload);
+             else {
+                this.customersService.addCustomer(payload);
+                this.router.navigate(['dashboard/masters/customers']);
+             }
           }
-          this.router.navigate(['dashboard/masters/customers']);
         } else {
           this.globals.SnackBar('error', res.Message || res.apiData || 'Operation failed');
         }

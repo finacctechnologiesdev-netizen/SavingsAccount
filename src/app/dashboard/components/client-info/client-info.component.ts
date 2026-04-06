@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService, Client } from '../../../auth/auth.service';
+import { Client } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-client-info',
@@ -13,11 +13,21 @@ export class ClientInfoComponent implements OnInit {
 
   client: Client | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   ngOnInit(): void {
-    if (this.authService.ClientInfo && this.authService.ClientInfo.length > 0) {
-      this.client = this.authService.ClientInfo[0];
+    if (typeof sessionStorage !== 'undefined') {
+      const clientData = sessionStorage.getItem('ClientInfo');
+      if (clientData) {
+        try {
+          const parsed = JSON.parse(clientData);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.client = parsed[0];
+          }
+        } catch (e) {
+          console.error("Failed to parse ClientInfo from sessionStorage", e);
+        }
+      }
     }
   }
 

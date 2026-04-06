@@ -61,13 +61,25 @@ export class SavingsPaymentsService {
         return this.api.get('app/getSavingsAcSummary', params);
     }
 
+    getSavingsCurrentBalance(SbAcSno: number, asOn: string): Observable<any> {
+        const params = {
+            data: JSON.stringify({
+                SbAcSno: SbAcSno,
+                AsOn: asOn,
+                CompSno: sessionStorage.getItem('CompSno')
+            }),
+            ClientCode: sessionStorage.getItem('ClientCode')
+        };
+        return this.api.get('app/getSavingsCurrentBalance', params);
+    }
+
     getVoucherSeries(): Observable<any> {
         const params = {
             data: JSON.stringify({
                 SeriesSno: 0,
                 CompSno: sessionStorage.getItem('CompSno'),
                 BranchSno: 1,
-                VouTypeSno: 22
+                VouTypeSno: 28
             })
         }
         return this.api.get('app/getVoucherSeries', params);

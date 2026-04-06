@@ -7,7 +7,7 @@ import { GlobalService } from '../../../../services/global.service';
 import { TableviewComponent } from '../../../../widgets/tableview/tableview.component';
 import { CustomerSummaryService, TypeCustomerSummary } from './customer-summary.service';
 import { CustomersService, TypeCustomer } from '../../masters/customers/customers.service';
-import { AccountsService } from '../../transactions/accounts/accounts.service';
+// import { AccountsService } from '../../transactions/accounts/accounts.service';
 import { SearchableDropdownComponent } from '../../../../widgets/searchable-dropdown/searchable-dropdown.component';
 import { IntToDatePipe } from '../../../../pipes/int-to-date.pipe';
 
@@ -24,7 +24,7 @@ export class CustomerSummaryComponent implements OnInit {
     public customerSummaryService: CustomerSummaryService,
     public customersService: CustomersService,
     public globals: GlobalService,
-    public accountsService: AccountsService,
+    // public accountsService: AccountsService,
     private router: Router
   ) {}
 
@@ -139,33 +139,33 @@ export class CustomerSummaryComponent implements OnInit {
     };
 
     // Use cached list if available
-    if (this.accountsService.accountsList.length > 0) {
-      const originalAccount = this.accountsService.accountsList.find(a => a.RdAccountSno === accountInfo.RdAccountSno);
-      if (originalAccount) {
-        executeNavigation(originalAccount);
-        return;
-      }
-    }
+    // if (this.accountsService.accountsList.length > 0) {
+    //   const originalAccount = this.accountsService.accountsList.find(a => a.RdAccountSno === accountInfo.RdAccountSno);
+    //   if (originalAccount) {
+    //     executeNavigation(originalAccount);
+    //     return;
+    //   }
+    // }
 
     // Default Fallback Payload
-    const fallbackData = {
-      ...accountInfo,
-      Mature_Amount: accountInfo.Maturity_Amount || (accountInfo as any).MaturityAmount
-    };
+    // const fallbackData = {
+    //   ...accountInfo,
+    //   Mature_Amount: accountInfo.Maturity_Amount || (accountInfo as any).MaturityAmount
+    // };
 
     // Attempt to load from API if not cached
-    this.accountsService.getAccounts().subscribe({
-      next: (res: any) => {
-        let list = res?.apiData ? (typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData) : 
-                   (typeof res === 'string' ? JSON.parse(res) : res);
+    // this.accountsService.getAccounts().subscribe({
+    //   next: (res: any) => {
+    //     let list = res?.apiData ? (typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData) : 
+    //                (typeof res === 'string' ? JSON.parse(res) : res);
                    
-        list = Array.isArray(list) ? list : [];
-        this.accountsService.accountsList = list;
+    //     list = Array.isArray(list) ? list : [];
+    //     this.accountsService.accountsList = list;
 
-        const originalAccount = list.find((a: any) => a.RdAccountSno === accountInfo.RdAccountSno);
-        executeNavigation(originalAccount || fallbackData);
-      },
-      error: () => executeNavigation(fallbackData)
-    });
+    //     const originalAccount = list.find((a: any) => a.RdAccountSno === accountInfo.RdAccountSno);
+    //     executeNavigation(originalAccount || fallbackData);
+    //   },
+    //   error: () => executeNavigation(fallbackData)
+    // });
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { TypeFieldInfo } from '../../../../Types/TypeFieldInfo';
 import { GlobalService } from '../../../../services/global.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { TableviewComponent } from '../../../../widgets/tableview/tableview.component';
 import { SavingsReceiptsService, TypeSavingsReceipt } from './savings-receipts.service';
 import { SavingAccountsService, TypeSavingAccount } from '../../masters/saving-accounts/saving-accounts.service';
@@ -26,6 +26,13 @@ export class SavingsReceiptsComponent implements OnInit {
     private printService: PrintService,
     private router: Router
   ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        if (this.router.url === '/dashboard/transactions/savings-receipts') {
+          this.updateDataSource([...this.receiptsService.receiptsList]);
+        }
+      }
+    });
   }
 
   //Date filtering vars
@@ -96,6 +103,7 @@ export class SavingsReceiptsComponent implements OnInit {
           case 1: return 'Cash';
           case 2: return 'Bank';
           case 3: return 'UPI';
+          case 4: return 'Other';
           default: return 'Unknown';
       }
   }

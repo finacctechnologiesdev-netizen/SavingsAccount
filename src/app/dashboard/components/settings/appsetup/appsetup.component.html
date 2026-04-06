@@ -18,41 +18,39 @@
     </div>
   </header>
 
-  <!-- Form — always editable, populated from API on load -->
-  @if (Setup) {
     <div class="form-scroll-content">
       <form class="clean-form-layout">
 
         <!-- Scheme Code Configuration -->
         <div class="form-section no-border">
-          <h6 class="group-label">Scheme Code Configuration</h6>
+          <h6 class="group-label">Account Code Configuration</h6>
           <div class="form-row">
 
             <!-- Auto Generate -->
             <div class="input-container w-180">
               <select
-                id="SchemeCode_AutoGen"
-                name="SchemeCode_AutoGen"
-                [(ngModel)]="Setup.SchemeCode_AutoGen">
+                id="AccCode_AutoGen"
+                name="AccCode_AutoGen"
+                [(ngModel)]="Setup.AccCode_AutoGen">
                 <option [ngValue]="0">Manual</option>
                 <option [ngValue]="1">Auto Generate</option>
               </select>
-              <label for="SchemeCode_AutoGen">Auto Generate</label>
+              <label for="AccCode_AutoGen">Auto Generate</label>
             </div>
 
-            <!-- Scheme Prefix -->
+            <!-- ACC Code Prefix -->
             <div class="input-container w-180">
               <input
                 type="text"
-                id="SchemeCode_Prefix"
-                name="SchemeCode_Prefix"
-                [(ngModel)]="Setup.SchemeCode_Prefix"
+                id="AccCode_Prefix"
+                name="AccCode_Prefix"
+                [(ngModel)]="Setup.AccCode_Prefix"
                 (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['SchemeCode_Prefix']"
+                [class.error]="submitCount > 0 && errors['AccCode_Prefix']"
                 placeholder=" " />
-              <label for="SchemeCode_Prefix">Scheme Prefix <span class="req">*</span></label>
-              @if (submitCount > 0 && errors['SchemeCode_Prefix']) {
-                <span class="error-msg">{{ errors['SchemeCode_Prefix'] }}</span>
+              <label for="AccCode_Prefix">Account Prefix <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['AccCode_Prefix']) {
+                <span class="error-msg">{{ errors['AccCode_Prefix'] }}</span>
               }
             </div>
 
@@ -60,15 +58,15 @@
             <div class="input-container w-160">
               <input
                 type="number"
-                id="SchemeCode_CurrentNo"
-                name="SchemeCode_CurrentNo"
-                [(ngModel)]="Setup.SchemeCode_CurrentNo"
+                id="AccCode_CurrentNo"
+                name="AccCode_CurrentNo"
+                [(ngModel)]="Setup.AccCode_CurrentNo"
                 (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['SchemeCode_CurrentNo']"
+                [class.error]="submitCount > 0 && errors['AccCode_CurrentNo']"
                 placeholder=" " />
-              <label for="SchemeCode_CurrentNo">Current No <span class="req">*</span></label>
-              @if (submitCount > 0 && errors['SchemeCode_CurrentNo']) {
-                <span class="error-msg">{{ errors['SchemeCode_CurrentNo'] }}</span>
+              <label for="AccCode_CurrentNo">Current No <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['AccCode_CurrentNo']) {
+                <span class="error-msg">{{ errors['AccCode_CurrentNo'] }}</span>
               }
             </div>
 
@@ -76,15 +74,15 @@
             <div class="input-container w-130">
               <input
                 type="number"
-                id="SchemeCode_Width"
-                name="SchemeCode_Width"
-                [(ngModel)]="Setup.SchemeCode_Width"
+                id="AccCode_Width"
+                name="AccCode_Width"
+                [(ngModel)]="Setup.AccCode_Width"
                 (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['SchemeCode_Width']"
+                [class.error]="submitCount > 0 && errors['AccCode_Width']"
                 placeholder=" " />
-              <label for="SchemeCode_Width">Code Width <span class="req">*</span></label>
-              @if (submitCount > 0 && errors['SchemeCode_Width']) {
-                <span class="error-msg">{{ errors['SchemeCode_Width'] }}</span>
+              <label for="AccCode_Width">Code Width <span class="req">*</span></label>
+              @if (submitCount > 0 && errors['AccCode_Width']) {
+                <span class="error-msg">{{ errors['AccCode_Width'] }}</span>
               }
             </div>
 
@@ -93,6 +91,5 @@
 
       </form>
     </div>
-  }
 
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { TypeFieldInfo } from '../../../../Types/TypeFieldInfo';
 import { GlobalService } from '../../../../services/global.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { TableviewComponent } from '../../../../widgets/tableview/tableview.component';
 import { SavingsPaymentsService, TypeSavingsPayment } from './savings-payments.service';
 import { SavingAccountsService, TypeSavingAccount } from '../../masters/saving-accounts/saving-accounts.service';
@@ -26,6 +26,13 @@ export class SavingsPaymentsComponent implements OnInit {
     private printService: PrintService,
     private router: Router
   ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        if (this.router.url === '/dashboard/transactions/savings-payments') {
+          this.updateDataSource([...this.paymentsService.paymentsList]);
+        }
+      }
+    });
   }
 
   //Date filtering vars

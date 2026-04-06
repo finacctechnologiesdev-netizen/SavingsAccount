@@ -23,36 +23,50 @@
           <!-- Row 1: Series No & intPosting No -->
           <div class="row-flex mb-0">
             <div class="input-container w-50">
-              <select id="SeriesSno" name="SeriesSno" [(ngModel)]="intPosting.SeriesSno"
+              <select
+                id="SeriesSno"
+                name="SeriesSno"
+                [(ngModel)]="intPosting.SeriesSno"
                 (change)="onSeriesChange()"
                 (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['SeriesSno']">
+                [class.error]="submitCount > 0 && errors['SeriesSno']"
+              >
                 <option [ngValue]="0" disabled>Select Series</option>
                 @for (series of seriesList; track series.SeriesSno) {
-                <option [ngValue]="series.SeriesSno">
-                  {{ series.Series_Name }}
-                </option>
+                  <option [ngValue]="series.SeriesSno">
+                    {{ series.Series_Name }}
+                  </option>
                 }
               </select>
               <label for="SeriesSno">Series <span class="req">*</span></label>
               @if (submitCount > 0 && errors["SeriesSno"]) {
-              <span class="error-msg">{{ errors["SeriesSno"] }}</span>
+                <span class="error-msg">{{ errors["SeriesSno"] }}</span>
               }
             </div>
             <div class="input-container w-50">
-              <input type="text" id="Posting_No" name="Posting_No" [(ngModel)]="intPosting.Posting_No"
+              <input
+                type="text"
+                id="Posting_No"
+                name="Posting_No"
+                [(ngModel)]="intPosting.Posting_No"
                 [disabled]="isReceiptNoDisabled"
                 [class.disabled-input]="isReceiptNoDisabled"
                 (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['Posting_No']" placeholder=" " (keypress)="
+                [class.error]="submitCount > 0 && errors['Posting_No']"
+                placeholder=" "
+                (keypress)="
                   this.globals.checklength10(
                     $event,
                     'intPosting No should be 10 characters'
                   )
-                " maxlength="10" />
-              <label for="Posting_No">intPosting No <span class="req">*</span></label>
+                "
+                maxlength="10"
+              />
+              <label for="Posting_No"
+                >intPosting No <span class="req">*</span></label
+              >
               @if (submitCount > 0 && errors["Posting_No"]) {
-              <span class="error-msg">{{ errors["Posting_No"] }}</span>
+                <span class="error-msg">{{ errors["Posting_No"] }}</span>
               }
             </div>
           </div>
@@ -60,54 +74,97 @@
           <!-- Row 2: intPosting Date & Account Selection -->
           <div class="row-flex mb-0">
             <div class="input-container w-50">
-              <input type="date" id="Posting_Date" name="Posting_Date" [(ngModel)]="intPosting.Posting_Date"
+              <input
+                type="date"
+                id="Posting_Date"
+                name="Posting_Date"
+                [(ngModel)]="intPosting.Posting_Date"
                 (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['Posting_Date']" placeholder=" " />
-              <label for="Posting_Date">intPosting Date <span class="req">*</span></label>
+                [class.error]="submitCount > 0 && errors['Posting_Date']"
+                placeholder=" "
+              />
+              <label for="Posting_Date"
+                >intPosting Date <span class="req">*</span></label
+              >
               @if (submitCount > 0 && errors["Posting_Date"]) {
-              <span class="error-msg">{{ errors["Posting_Date"] }}</span>
+                <span class="error-msg">{{ errors["Posting_Date"] }}</span>
               }
             </div>
-            <div class="input-container w-50" style="position: relative;">
+            <div class="input-container w-50" style="position: relative">
               @if (accountsForDropdown.length === 0) {
-              <input type="text" [disabled]="true" placeholder="Loading accounts..." class="disabled-input">
-              <label>Account No <span class="req">*</span></label>
+                <input
+                  type="text"
+                  [disabled]="true"
+                  placeholder="Loading accounts..."
+                  class="disabled-input"
+                />
+                <label>Account No <span class="req">*</span></label>
               } @else {
-              <app-selectionlist [DataSource]="accountsForDropdown" Caption="Account No *"
-                [SelectedItem]="selectedAccountForDropdown"
-                (newItemEvent)="onAccountItemSelected($event)"></app-selectionlist>
+                <app-selectionlist
+                  [DataSource]="accountsForDropdown"
+                  Caption="Account No *"
+                  [SelectedItem]="selectedAccountForDropdown"
+                  (newItemEvent)="onAccountItemSelected($event)"
+                ></app-selectionlist>
               }
               @if (submitCount > 0 && errors["SbAcSno"]) {
-              <span class="error-msg"
-                [ngStyle]="accountsForDropdown.length > 0 ? {'right': '2.5rem'} : null">{{ errors["SbAcSno"] }}</span>
+                <span
+                  class="error-msg"
+                  [ngStyle]="
+                    accountsForDropdown.length > 0 ? { right: '2.5rem' } : null
+                  "
+                  >{{ errors["SbAcSno"] }}</span
+                >
               }
             </div>
           </div>
 
           <!-- Row 3: Customer -->
-          <div class="input-container w-100">
-            <input type="text" id="Customer" name="Customer" [value]="selectedCustomer?.Party_Name || ''"
-              placeholder=" " disabled />
-            <label for="Customer">Customer</label>
-          </div>
+         
 
           <!-- Row 4: Amount -->
           <div class="row-flex mb-0">
+
              <div class="input-container w-100">
-              <input type="number" id="Amount" name="Amount" [(ngModel)]="intPosting.Amount" appInputBehavior
-                [minVal]="0" (blur)="submitCount > 0 ? validateFields() : null"
-                [class.error]="submitCount > 0 && errors['Amount']" placeholder=" " />
+            <input
+              type="text"
+              id="Customer"
+              name="Customer"
+              [value]="selectedCustomer?.Party_Name || ''"
+              placeholder=" "
+              disabled
+            />
+            <label for="Customer">Customer</label>
+          </div>
+            <div class="input-container w-100">
+              <input
+                type="number"
+                id="Amount"
+                name="Amount"
+                [(ngModel)]="intPosting.Amount"
+                appInputBehavior
+                [minVal]="0"l;
+                (blur)="submitCount > 0 ? validateFields() : null"
+                [class.error]="submitCount > 0 && errors['Amount']"
+                placeholder=" "
+              />
               <label for="Amount">Amount <span class="req">*</span></label>
               @if (submitCount > 0 && errors["Amount"]) {
-              <span class="error-msg">{{ errors["Amount"] }}</span>
+                <span class="error-msg">{{ errors["Amount"] }}</span>
               }
             </div>
           </div>
 
           <!-- Row 5: Reference -->
           <div class="row-flex mb-0">
-            <div class="input-container w-100">
-              <input type="text" id="Reference" name="Reference" [(ngModel)]="intPosting.Reference" placeholder=" " />
+            <div class="input-container w-50">
+              <input
+                type="text"
+                id="Reference"
+                name="Reference"
+                [(ngModel)]="intPosting.Reference"
+                placeholder=" "
+              />
               <label for="Reference">Reference</label>
             </div>
           </div>
@@ -115,8 +172,13 @@
           <!-- Row 6: Remarks -->
           <div class="row-flex mb-0">
             <div class="input-container w-100">
-              <textarea id="Remarks" name="Remarks" [(ngModel)]="intPosting.Remarks" placeholder=" "
-                class="remarks-field"></textarea>
+              <textarea
+                id="Remarks"
+                name="Remarks"
+                [(ngModel)]="intPosting.Remarks"
+                placeholder=" "
+                class="remarks-field"
+              ></textarea>
               <label for="Remarks">Remarks</label>
             </div>
           </div>
@@ -129,77 +191,84 @@
             <h6 class="group-label">Account Details</h6>
 
             @if (selectedAccount) {
-            <div class="account-details-container">
-              <div class="account-info-section">
-                <div class="info-row">
-                  <div class="info-item">
-                    <span class="info-label">Account Number</span>
-                    <span class="info-value">{{
-                      selectedAccount.SbAccount_No
+              <div class="account-details-container">
+                <div class="account-info-section">
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Account Number</span>
+                      <span class="info-value">{{
+                        selectedAccount.SbAccount_No
                       }}</span>
-                  </div>
-                  <div class="info-item text-right">
-                    <span class="info-label">Customer</span>
-                    <span class="info-value">{{
-                      selectedCustomer?.Party_Name || 'NIL'
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Customer</span>
+                      <span class="info-value">{{
+                        selectedCustomer?.Party_Name || "NIL"
                       }}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div class="info-row">
-                  <div class="info-item">
-                    <span class="info-label">Passbook No</span>
-                    <span class="info-value">{{
-                      selectedAccount.Passbook_No || 'NIL'
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Passbook No</span>
+                      <span class="info-value">{{
+                        selectedAccount.Passbook_No || "NIL"
                       }}</span>
-                  </div>
-                  <div class="info-item text-right">
-                    <span class="info-label">Account Date</span>
-                    <span class="info-value">{{
-                      (selectedAccount.CreateDate?.date || selectedAccount.CreateDate) | date: "dd/MM/yyyy"
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Account Date</span>
+                      <span class="info-value">{{
+                        selectedAccount.CreateDate?.date ||
+                          selectedAccount.CreateDate | date: "dd/MM/yyyy"
                       }}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div class="info-row">
-                  <div class="info-item">
-                    <span class="info-label">Joint Customer</span>
-                    <span class="info-value">{{
-                      selectedJointCustomer?.Party_Name || 'NIL'
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">Joint Customer</span>
+                      <span class="info-value">{{
+                        selectedJointCustomer?.Party_Name || "NIL"
                       }}</span>
-                  </div>
-                  <div class="info-item text-right">
-                    <span class="info-label">Account Status</span>
-                    <span class="info-value" [class]="
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Account Status</span>
+                      <span
+                        class="info-value"
+                        [class]="
                           selectedAccount.IsActive == 1
                             ? 'text-success'
                             : 'text-danger'
-                        ">{{
-                      selectedAccount.IsActive == 1 ? "Active" : "Inactive"
-                      }}</span>
+                        "
+                        >{{
+                          selectedAccount.IsActive == 1 ? "Active" : "Inactive"
+                        }}</span
+                      >
+                    </div>
                   </div>
-                </div>
 
-                <div class="info-row no-border-bottom">
-                   <div class="info-item">
-                     <span class="info-label">Current Balance</span>
-                     <span class="info-value text-success amount-highlight"><i class="bx bx-rupee"></i>
-                       {{ accountSummary?.Balance || 0 }}</span>
-                   </div>
-                   <div class="info-item text-right">
-                     <span class="info-label">Last intPosting Date</span>
-                     <span class="info-value">{{
-                       accountSummary?.Last_Posting_Date || 'NIL'
-                       }}</span>
+                  <div class="info-row no-border-bottom">
+                    <div class="info-item">
+                      <span class="info-label">Current Balance</span>
+                      <span class="info-value text-success amount-highlight"
+                        ><i class="bx bx-rupee"></i>
+                        {{ accountSummary?.Balance || 0 }}</span
+                      >
+                    </div>
+                    <div class="info-item text-right">
+                      <span class="info-label">Last intPosting Date</span>
+                      <span class="info-value">{{
+                        accountSummary?.Last_Posting_Date || "NIL"
+                      }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             } @else {
-            <div class="empty-state empty-account">
-              <i class="bx bx-file"></i>
-              <p>Select an account to view details</p>
-            </div>
+              <div class="empty-state empty-account">
+                <i class="bx bx-file"></i>
+                <p>Select an account to view details</p>
+              </div>
             }
           </div>
 
@@ -230,5 +299,3 @@
     </form>
   </div>
 </div>
-
-

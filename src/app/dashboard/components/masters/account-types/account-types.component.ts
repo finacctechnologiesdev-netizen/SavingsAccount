@@ -60,7 +60,14 @@ export class AccountTypesComponent implements OnInit {
   }
 
   updateDataSource(list: TypeAcType[]) {
-    this.DataSource.set([...list]);
+    const mappedList = list.map(acType => {
+      return {
+        ...acType,
+        Ac_Category: acType.Ac_Category == 1 ? "Savings" : acType.Ac_Category == 2 ? "Current" : "Other"
+      };
+    });
+    
+    this.DataSource.set(mappedList);
   }
 
   handleAction(event: any) {
@@ -89,7 +96,8 @@ export class AccountTypesComponent implements OnInit {
   deleteAcType(acType: TypeAcType) {
     this.globals.MsgBox(2, 'Are you sure you want to delete this account type?').then((result) => {
       if (result === 1) {
-        const deletePayload = { ...acType };
+        const deletePayload = this.acTypesService.acTypesList.find(s => s.AcTypeSno === acType.AcTypeSno) as TypeAcType;
+        // const deletePayload = { ...(originalAcType || acType) };
         delete deletePayload.CreateDate;
         this.acTypesService.crudAcType(2, deletePayload).subscribe({
           next: (res: any) => {

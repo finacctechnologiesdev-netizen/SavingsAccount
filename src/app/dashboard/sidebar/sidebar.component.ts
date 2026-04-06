@@ -35,7 +35,6 @@ export class SidebarComponent implements OnInit {
       icon: 'bx bx-data',
       children: [
         { label: 'Customers', route: '/dashboard/masters/customers', icon: 'bx bx-user' },
-        { label: 'Savings Accounts', route: '/dashboard/masters/saving-accounts', icon: 'bx bx-user-circle' },
         { label: 'Account Types', route: '/dashboard/masters/account-types', icon: 'bx bx-list-ul' }
       ]
     },
@@ -45,33 +44,33 @@ export class SidebarComponent implements OnInit {
       icon: 'bx bx-transfer',
       children: [
         //{ label: 'Accounts', route: '/dashboard/transactions/accounts', icon: 'bx bx-user-circle' },
-        { label: 'Savings Receipts', route: '/dashboard/transactions/savings-receipts', icon: 'bx bx-receipt' },
-        { label: 'Savings Payments', route: '/dashboard/transactions/savings-payments', icon: 'bx bx-credit-card' },
+        { label: 'Savings Accounts', route: '/dashboard/masters/saving-accounts', icon: 'bx bx-user-circle' },
+        { label: 'Savings Deposit', route: '/dashboard/transactions/savings-receipts', icon: 'bx bx-receipt' },
+        { label: 'Savings Withdrawal', route: '/dashboard/transactions/savings-payments', icon: 'bx bx-credit-card' },
         { label: 'Interest Postings', route: '/dashboard/transactions/savings-int-postings', icon: 'bx bx-bar-chart' },
         //{ label: 'Closures', route: '/dashboard/transactions/closures', icon: 'bx bx-x-circle' }
       ]
     },
-    // {
-    //   label: 'Reports',
-    //   id: 'Reports',
-    //   icon: 'bx bx-file',
-    //   children: [
-    //     { label: 'RD History', route: '/dashboard/reports/rd-history', icon: 'bx bx-building' },
-    //     { label: 'Pending Report', route: '/dashboard/reports/pending-report', icon: 'bx bx-building' },
-    //     { label: 'Customer Summary', route: '/dashboard/reports/customer-summary', icon: 'bx bx-building' },
-    //     { label: 'Account Summary', route: '/dashboard/reports/account-summary', icon: 'bx bx-building' },
-    //   ]
-    // },
-    //  {
-    //   label: 'Settings',
-    //   id: 'Settings',
-    //   icon: 'bx bx-cog',
-    //   children: [
-    //   { label: 'Companies', route: '/dashboard/settings/companies', icon: 'bx bx-building' },
-    //    { label: 'Voucher Series', route: '/dashboard/settings/voucher-serieses', icon: 'bx bx-building' },
-    //    { label: 'App Setup', route: '/dashboard/settings/appsetup', icon: 'bx bx-cog' }
-    //   ]
-    // },
+    {
+      label: 'Reports',
+      id: 'Reports',
+      icon: 'bx bx-file',
+      children: [
+        // { label: 'RD History', route: '/dashboard/reports/rd-history', icon: 'bx bx-building' },
+        // { label: 'Pending Report', route: '/dashboard/reports/pending-report', icon: 'bx bx-building' },
+        { label: 'Account Summary', route: '/dashboard/reports/saving-acc-summary', icon: 'bx bx-building' },
+      ]
+    },
+    {
+      label: 'Settings',
+      id: 'Settings',
+      icon: 'bx bx-cog',
+      children: [
+        //{ label: 'Companies', route: '/dashboard/settings/companies', icon: 'bx bx-building' },
+        { label: 'Voucher Series', route: '/dashboard/settings/voucher-serieses', icon: 'bx bx-building' },
+        { label: 'App Setup', route: '/dashboard/settings/appsetup', icon: 'bx bx-cog' }
+      ]
+    },
   ];
 
   constructor(private router: Router) { }
@@ -114,5 +113,15 @@ export class SidebarComponent implements OnInit {
       return !!sessionStorage.getItem('CompSno');
     }
     return false;
+  }
+
+  showSupportPopup: boolean = false;
+
+  toggleSupportPopup(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.showSupportPopup = !this.showSupportPopup;
   }
 }

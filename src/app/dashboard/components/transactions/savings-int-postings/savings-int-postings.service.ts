@@ -66,7 +66,7 @@ export class SavingsIntPostingsService {
                 SeriesSno: 0,
                 CompSno: sessionStorage.getItem('CompSno'),
                 BranchSno: 1,
-                VouTypeSno: 22
+                VouTypeSno: 29
             })
         }
         return this.api.get('app/getVoucherSeries', params);

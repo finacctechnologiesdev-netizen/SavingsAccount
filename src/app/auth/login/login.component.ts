@@ -40,8 +40,8 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('App_Login', username);
           localStorage.setItem('App_Pwd', password);
           localStorage.setItem('Client_Code', res.apiData.ClientInfo[0].Client_Code);
-          this.authService.ClientInfo = res.apiData.ClientInfo;
-          //console.log("ClientInfo", this.authService.ClientInfo);
+          //this is for client info component 
+          sessionStorage.setItem('ClientInfo', JSON.stringify(res.apiData.ClientInfo));
 
           const compInfo = res.apiData.CompInfo || [];
           if (compInfo.length === 1) {

@@ -15,33 +15,54 @@
           <div class="input-container w-50">
             <input type="text" id="SbAccount_No" name="SbAccount_No" [(ngModel)]="Account.SbAccount_No"
               (blur)="submitCount > 0 ? validateFields() : null"
-              [class.error]="submitCount > 0 && errors['SbAccount_No']" placeholder=" " maxlength="20" />
+              [class.error]="submitCount > 0 && errors['SbAccount_No']" placeholder=" " maxlength="20"
+              [disabled]="setupConfig?.AccCode_AutoGen === 1 && !isEditMode"
+              [style.cursor]="setupConfig?.AccCode_AutoGen === 1 && !isEditMode ? 'not-allowed' : 'auto'" />
             <label for="SbAccount_No">Account No <span class="req">*</span></label>
             @if (submitCount > 0 && errors["SbAccount_No"]) {
-              <span class="error-msg">{{ errors["SbAccount_No"] }}</span>
+            <span class="error-msg">{{ errors["SbAccount_No"] }}</span>
             }
           </div>
 
           <div class="input-container w-50">
-            <input type="text" id="Passbook_No" name="Passbook_No" [(ngModel)]="Account.Passbook_No"
-              placeholder=" " />
-            <label for="Passbook_No">Passbook No</label>
+            <input type="text" id="Reference" name="Reference" [(ngModel)]="Account.Reference" placeholder=" " />
+            <label for="Reference">Reference</label>
           </div>
+
+
         </div>
 
         <div class="row-flex">
-          <div class="input-container w-50">
-            <input type="number" id="AcTypeSno" name="AcTypeSno" [(ngModel)]="Account.AcTypeSno" placeholder=" " />
-            <label for="AcTypeSno">Account Type</label>
+          <div class="input-container w-50" style="position: relative;">
+            <app-selectionlist [DataSource]="accountTypesForDropdown" Caption="Account Type *"
+              [SelectedItem]="selectedAccountTypeForDropdown"
+              (newItemEvent)="onAccountTypeSelected($event)"></app-selectionlist>
+            @if (submitCount > 0 && errors['AcTypeSno']) {
+            <span class="error-msg" style="right: 2.5rem">{{ errors['AcTypeSno'] }}</span>
+            }
           </div>
 
+          @if(isEditMode){
+          <div class="input-container w-50">
+            <input type="date" id="CreateDate" name="CreateDate" [(ngModel)]="Account.CreateDate" placeholder=" " />
+            <label for="CreateDate">Create Date <span class="req">*</span></label>
+          </div>
+          }
+        </div>
+        <div class="row-flex">
           <div class="input-container w-50" style="position: relative;">
             <app-selectionlist [DataSource]="customersForDropdown" Caption="Primary Customer *"
               [SelectedItem]="selectedCustomerForDropdown"
               (newItemEvent)="onCustomerSelected($event)"></app-selectionlist>
             @if (submitCount > 0 && errors['PartySno']) {
-              <span class="error-msg" style="right: 2.5rem">{{ errors['PartySno'] }}</span>
+            <span class="error-msg" style="right: 2.5rem">{{ errors['PartySno'] }}</span>
             }
+          </div>
+
+          <div class="input-container w-50">
+            <input type="text" id="Passbook_No" name="Passbook_No" [(ngModel)]="Account.Passbook_No" placeholder=" "
+              disabled style="cursor: not-allowed;" />
+            <label for="Passbook_No">Passbook No</label>
           </div>
         </div>
 
@@ -70,21 +91,21 @@
         <hr class="group-divider" />
         <h6 class="group-label">Properties</h6>
 
+
+
         <div class="row-flex flex-col">
           <div class="toggle-wrapper w-100">
             <span class="status-label">Status:</span>
             <label class="switch">
-              <input
-                type="checkbox"
-                name="IsActive"
-                [ngModel]="Account.IsActive === 1"
-                (ngModelChange)="Account.IsActive = $event ? 1 : 0"
-              />
+              <input type="checkbox" name="IsActive" [ngModel]="Account.IsActive === 1"
+                (ngModelChange)="Account.IsActive = $event ? 1 : 0" />
               <span class="slider"></span>
             </label>
             <span class="status-text">{{ Account.IsActive === 1 ? "Active" : "Inactive" }}</span>
           </div>
         </div>
+
+
       </form>
     </div>
 

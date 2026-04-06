@@ -1,73 +1,79 @@
 <div class="page-container">
     @if(client) {
-    <div class="profile-card">
-        <div class="card-header">
-            <h2>Client Information</h2>
-        </div>
-        <div class="card-body">
-
-            <div class="info-group">
-                <span class="info-label">Client Code</span>
-                <span class="info-value">{{ client.Client_Code || '-' }}</span>
+    <div class="client-dashboard">
+        
+        <!-- Header Section -->
+        <div class="dashboard-header">
+            <div class="brand-avatar">
+                <i class="bx bx-buildings"></i>
             </div>
-
-            <div class="info-group">
-                <span class="info-label">Client Name</span>
-                <span class="info-value">{{ client.Client_Name || '-' }}</span>
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">Address</span>
-                <span class="info-value">{{ client.Address || '-' }}</span>
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">State</span>
-                <span class="info-value">{{ client.State || '-' }}</span>
-            </div>
-
-            <div class="info-row">
-                <div class="info-group w-50">
-                    <span class="info-label">Mobile</span>
-                    <span class="info-value">{{ client.Mobile || '-' }}</span>
-                </div>
-                <div class="info-group w-50">
-                    <span class="info-label">Alternate Mobile</span>
-                    <span class="info-value">{{ client.Alternate_Mobile || '-' }}</span>
+            <div class="brand-info">
+                <h2>{{ client.Client_Code || 'UNKNOWN CLIENT' }}</h2>
+                <div class="version-badge" 
+                     [class.enterprise]="client.Version_Type === 1" 
+                     [class.professional]="client.Version_Type === 2">
+                    <i class="bx bx-award"></i>
+                    {{ client.Version_Type === 1 ? 'Enterprise' : (client.Version_Type === 2 ? 'Professional' : 'Basic') }} Edition
                 </div>
             </div>
-
-            <div class="info-row">
-                <div class="info-group w-50">
-                    <span class="info-label">Email</span>
-                    <span class="info-value">{{ client.Email || '-' }}</span>
-                </div>
-                <div class="info-group w-50">
-                    <span class="info-label">Contact Person</span>
-                    <span class="info-value">{{ client.Contact_Person || '-' }}</span>
-                </div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-group w-50">
-                    <span class="info-label">Subscription Start Date</span>
-                    <span class="info-value">{{ formatNumberToDate(client.Subscription_Start) }}</span>
-                </div>
-                <div class="info-group w-50">
-                    <span class="info-label">Subscription End Date</span>
-                    <span class="info-value">{{ formatNumberToDate(client.Subscription_End) }}</span>
-                </div>
-            </div>
-
         </div>
 
-        <div class="card-footer">
-            <h3>Registered Version: {{ client.Version_Type === 1 ? 'Pro' : (client.Version_Type === 2 ? 'Enterprise' :
-                'Basic') }}</h3>
+        <!-- Body Section -->
+        <div class="dashboard-body">
+            
+            <div class="section-container">
+                <div class="section-title">
+                    <i class="bx bx-info-circle"></i> 
+                    <span>General Information</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-group">
+                        <span class="info-label">Creation Date</span>
+                        <span class="info-value">
+                            <i class="bx bx-calendar"></i>
+                            {{ formatNumberToDate(client.Creation_Date) }}
+                        </span>
+                    </div>
+
+                    <div class="info-group">
+                        <span class="info-label">Mobile Number</span>
+                        <span class="info-value">
+                            <i class="bx bx-phone"></i>
+                            +91 {{ client.Mobile || '-' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-container">
+                <div class="section-title">
+                    <i class="bx bx-time-five"></i> 
+                    <span>Subscription Details</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-group subscription-start">
+                        <span class="info-label">Start Date</span>
+                        <span class="info-value">
+                            <i class="bx bx-calendar-check text-success"></i>
+                            {{ formatNumberToDate(client.Subscription_Start) }}
+                        </span>
+                    </div>
+
+                    <div class="info-group subscription-end">
+                        <span class="info-label">End Date</span>
+                        <span class="info-value">
+                            <i class="bx bx-calendar-x text-danger"></i>
+                            {{ formatNumberToDate(client.Subscription_End) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     } @else {
     <div class="no-data">
+        <i class="bx bx-folder-open empty-icon"></i>
         <p>No client information retrieved.</p>
     </div>
     }

@@ -100,14 +100,16 @@
 
 /* Modifying standard native table for the company list */
 .native-table-container {
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+  border: 1px solid var(--border);
+  //border-radius: var(--radius-md);
+ // box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .company-table {
   width: 100%;
   border-collapse: collapse;
+  margin: 0;
 
   thead th {
     background-color: var(--primary); 
@@ -115,7 +117,7 @@
     text-transform: none; 
     font-weight: 600;
     font-size: 0.95rem;
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 1rem;
     border: none;
     white-space: nowrap;
 
@@ -126,12 +128,10 @@
 
   tbody tr {
     cursor: pointer;
-    transition: background-color 0.2s ease, border-left 0.2s ease, padding-left 0.2s ease;
-    border-left: 4px solid transparent;
+    transition: background-color 0.2s ease;
 
     &:hover {
       background-color: var(--accent);
-      padding-left: 0.25rem;
 
       .action-btn {
         color: var(--primary);
@@ -140,10 +140,9 @@
     }
 
     td {
-      padding: 1rem 1.5rem;
+      padding: 1rem 1rem;
       color: var(--foreground);
       font-size: 0.95rem;
-      transition: padding-left 0.2s ease;
 
       &.fw-bold {
         font-weight: 600;
@@ -195,7 +194,6 @@
 
 .company-table tbody tr.active-row {
   background: color-mix(in srgb, var(--primary) 8%, transparent);
-  border-left: 4px solid var(--primary) !important;
 
   &:hover {
     background: color-mix(in srgb, var(--primary) 14%, transparent);
@@ -203,7 +201,6 @@
 
   td {
     color: var(--foreground);
-    font-weight: 500;
   }
 }
 
@@ -220,11 +217,7 @@
   }
 }
 
-// Company name cell layout
-.company-name-cell {
-  display: flex;
-  align-items: center;
-}
+
 
 // "Current" badge next to company name
 .current-tag {

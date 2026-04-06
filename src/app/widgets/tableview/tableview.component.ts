@@ -56,6 +56,7 @@ export class TableviewComponent {
   @Input() EnablePrint: boolean = false;
   @Input() EnableMail: boolean = false;
   @Input() OutputFileName: string = "";
+  @Input() EnableDelete: boolean = true;
 
   TotalFields = input<string[]>();
   Totals: number[] = [];

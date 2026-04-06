@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GlobalService } from '../../../../services/global.service';
-import { AppsetupService, TypeAppSetup } from './appsetup.service';
+import { AppsetupService, TypeSavingsSetup } from './appsetup.service';
 
 @Component({
   selector: 'app-appsetup',
@@ -12,7 +12,7 @@ import { AppsetupService, TypeAppSetup } from './appsetup.service';
   styleUrl: './appsetup.component.scss',
 })
 export class AppsetupComponent implements OnInit {
-  Setup!: TypeAppSetup;
+  Setup!: TypeSavingsSetup;
   isSaving: boolean = false;
   submitCount = 0;
   errors: any = {};
@@ -20,52 +20,22 @@ export class AppsetupComponent implements OnInit {
   constructor(
     public globals: GlobalService,
     private appsetupService: AppsetupService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    this.Setup = this.appsetupService.initializeSetup();
     this.loadSetup();
   }
 
   loadSetup() {
     this.appsetupService.getRdSetup().subscribe({
-      next: (res: any) => {
-        let data = res;
-
-        // Handle { queryStatus, apiData } wrapper
-        if (res && res.apiData) {
-          data =
-            typeof res.apiData === 'string'
-              ? JSON.parse(res.apiData)
-              : res.apiData;
-        } else if (typeof res === 'string') {
-          try {
-            data = JSON.parse(res);
-          } catch (e) {}
+      next: (res: TypeSavingsSetup[]) => {
+        if (res && res.length > 0) {
+          this.Setup = res[0];
         }
-
-        // If result is an array, take first record
-        if (Array.isArray(data)) {
-          data = data[0];
-        }
-
-        if (data && typeof data === 'object') {
-          this.Setup = {
-            CompSno: data.CompSno ?? Number(sessionStorage.getItem('CompSno')),
-            UserSno: data.UserSno ?? 1,
-            SchemeCode_AutoGen: data.SchemeCode_AutoGen ?? 0,
-            SchemeCode_Prefix: data.SchemeCode_Prefix ?? '',
-            SchemeCode_CurrentNo: data.SchemeCode_CurrentNo ?? 0,
-            SchemeCode_Width: data.SchemeCode_Width ?? 0,
-          };
-        } else {
-          this.Setup = this.appsetupService.initializeSetup();
-        }
-
-        console.log('App Setup loaded:', this.Setup);
       },
       error: (err) => {
         this.Setup = this.appsetupService.initializeSetup();
-        console.error('Error loading app setup:', err);
         this.globals.SnackBar('error', 'Failed to load App Setup data');
       },
     });
@@ -80,25 +50,18 @@ export class AppsetupComponent implements OnInit {
       isValid = false;
     };
 
-    if (
-      !this.Setup.SchemeCode_Prefix ||
-      this.Setup.SchemeCode_Prefix.trim() === ''
-    ) {
-      setError('SchemeCode_Prefix', 'Scheme Prefix is Required');
+    if (this.Setup.AccCode_Prefix == '') {
+      setError('AccCode_Prefix', 'AccCode_Prefix is Required');
+      console.log("AccCode_Prefix is Required");
     }
-    if (
-      this.Setup.SchemeCode_CurrentNo === null ||
-      this.Setup.SchemeCode_CurrentNo === undefined
-    ) {
-      setError('SchemeCode_CurrentNo', 'Current No is Required');
+    if (!this.Setup.AccCode_CurrentNo) {
+      setError('AccCode_CurrentNo', 'AccCode_CurrentNo is Required');
+      console.log("AccCode_CurrentNo is Required");
     }
-    if (
-      this.Setup.SchemeCode_Width === null ||
-      this.Setup.SchemeCode_Width === undefined
-    ) {
-      setError('SchemeCode_Width', 'Width is Required');
+    if (!this.Setup.AccCode_Width) {
+      setError('AccCode_Width', 'Width is Required');
+      console.log("AccCode_Width is Required");
     }
-
     return isValid;
   }
 
@@ -108,21 +71,13 @@ export class AppsetupComponent implements OnInit {
       this.globals.SnackBar('error', 'Please fill required fields');
       return;
     }
-
     this.isSaving = true;
+    console.log(this.Setup);
     this.appsetupService.updateRdSetup(this.Setup).subscribe({
+
       next: (res: any) => {
         this.isSaving = false;
         this.globals.SnackBar('success', 'App Setup updated successfully');
-        if (res.Status === 'Success' || res.queryStatus === 1) {
-          //this.globals.SnackBar('success', 'App Setup updated successfully');
-
-        } else {
-          this.globals.SnackBar(
-            'error',
-            res.userMessage || res.Message || 'Update failed',
-          );
-        }
       },
       error: (err) => {
         this.isSaving = false;
@@ -132,3 +87,16 @@ export class AppsetupComponent implements OnInit {
     });
   }
 }
+
+
+
+
+// if (res.Status === 'Success' || res.queryStatus === 1) {
+//   //this.globals.SnackBar('success', 'App Setup updated successfully');
+
+// } else {
+//   this.globals.SnackBar(
+//     'error',
+//     res.userMessage || res.Message || 'Update failed',
+//   );
+// }

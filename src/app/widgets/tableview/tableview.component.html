@@ -134,9 +134,11 @@
                 <i class="bx bx-printer"></i>
               </button>
               }
+              @if(EnableDelete){
               <button class="action-btn delete-btn" (click)="DeleteRecord(row, i)" title="Delete">
                 <i class="bx bx-trash i2"></i>
               </button>
+              }
               @if (EnableMail) {
               <button class="action-btn btn-mail" (click)="MailRecord(row, i)" title="Mail">
                 <i class="bx bx-envelope"></i>

@@ -10,6 +10,7 @@ import { TransactionNumberService } from '../../../../../services/transaction-nu
 import { InputBehaviorDirective } from '../../../../../directives/input-behavior.directive';
 import { ChangeDetectorRef } from '@angular/core';
 import { SelectionlistComponent } from '../../../../../widgets/selectionlist/selectionlist/selectionlist.component';
+import { AccountTypesService } from '../../../masters/account-types/account-types.service';
 
 @Component({
   selector: 'app-savings-payment',
@@ -30,7 +31,10 @@ export class SavingsPaymentComponent implements OnInit {
   accountsList: TypeSavingAccount[] = [];
   customersList: TypeCustomer[] = [];
   seriesList: any[] = [];
-  accountSummary: any = null;
+  currentBalance: number = 0;
+  minBalance: number = 0;
+  availableBalance: number = 0;
+  isBalanceLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -41,6 +45,7 @@ export class SavingsPaymentComponent implements OnInit {
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private transNumService: TransactionNumberService,
+    private acTypesService: AccountTypesService
   ) { }
 
   get selectedAccount(): TypeSavingAccount | undefined {
@@ -57,6 +62,13 @@ export class SavingsPaymentComponent implements OnInit {
     const account = this.selectedAccount;
     if (!account || !account.JointPartySno) return undefined;
     return this.customersList.find(c => Number(c.PartySno) === Number(account.JointPartySno));
+  }
+
+  get selectedAccountCategory(): string | undefined {
+    const acTypeVal = this.acTypesService.acTypesList.find((type) => type.AcTypeSno === this.selectedAccount?.AcTypeSno);
+    if (!acTypeVal) return undefined;
+    const cat = Number(acTypeVal.Ac_Category);
+    return cat === 1 ? 'Savings' : cat === 2 ? 'Current' : cat === 3 ? 'Other' : undefined;
   }
 
   get accountsForDropdown(): any[] {
@@ -99,6 +111,7 @@ export class SavingsPaymentComponent implements OnInit {
     this.loadAccounts();
     this.loadCustomers();
     this.loadVoucherSeries();
+    this.loadAcTypes();
 
     const stateData = history.state.data;
     if (stateData) {
@@ -115,6 +128,25 @@ export class SavingsPaymentComponent implements OnInit {
       const today = new Date();
       this.payment.Payment_Date = this.globals.formatDate(today, 'yyyy-MM-dd');
     }
+  }
+
+  loadAcTypes() {
+      if (this.acTypesService.acTypesList && this.acTypesService.acTypesList.length > 0) {
+          return;
+      }
+      this.acTypesService.getAcTypes().subscribe({
+          next: (res: any) => {
+              let list = res;
+              if (res && res.apiData) {
+                  list = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
+              } else if (typeof res === 'string') {
+                  try { list = JSON.parse(res); } catch(e) {}
+              }
+              if (!Array.isArray(list)) list = [];
+              this.acTypesService.acTypesList = list;
+          },
+          error: (err) => console.error(err)
+      });
   }
 
   loadAccounts() {
@@ -217,27 +249,41 @@ export class SavingsPaymentComponent implements OnInit {
 
   onAccountSelected() {
       if (this.payment.SbAcSno) {
-          this.paymentsService.getAccountSummary(this.payment.SbAcSno).subscribe({
+          const acType = this.acTypesService.acTypesList.find((type: any) => type.AcTypeSno === this.selectedAccount?.AcTypeSno);
+          this.minBalance = acType ? Number(acType.Min_Balance) || 0 : 0;
+          this.isBalanceLoading = true;
+          this.currentBalance = 0;
+          this.availableBalance = 0;
+          
+          const asOnDate = this.payment.Payment_Date || this.globals.formatDate(new Date(), 'yyyy-MM-dd');
+          this.paymentsService.getSavingsCurrentBalance(this.payment.SbAcSno, asOnDate).subscribe({
               next: (res: any) => {
-                  let data = res;
-                  if (res && res.apiData) {
-                      data = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
+                  let bal = res;
+                  if (res && res.apiData !== undefined) {
+                      bal = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
                   } else if (typeof res === 'string') {
-                      try { data = JSON.parse(res); } catch(e) {}
+                      try { bal = JSON.parse(res); } catch(e) {}
                   }
-                  
-                  if (Array.isArray(data) && data.length > 0) {
-                      this.accountSummary = data[0];
-                  } else {
-                      this.accountSummary = null;
-                  }
+                  this.currentBalance = Number(bal) || 0;
+                  this.availableBalance = this.currentBalance - this.minBalance;
+                  this.isBalanceLoading = false;
                   this.cdr.detectChanges();
               },
-              error: (err) => console.error(err)
+              error: (err) => {
+                  console.error(err);
+                  this.isBalanceLoading = false;
+                  this.cdr.detectChanges();
+              }
           });
       } else {
-          this.accountSummary = null;
+          this.currentBalance = 0;
+          this.minBalance = 0;
+          this.availableBalance = 0;
       }
+  }
+
+  isBalanceLow(): boolean {
+      return this.availableBalance <= (this.minBalance * 0.1) || this.availableBalance <= 0;
   }
 
   validateFields(): boolean {
@@ -254,6 +300,7 @@ export class SavingsPaymentComponent implements OnInit {
     if (!data.Payment_Date) setError('Payment_Date', 'payment Date is Required');
     if (!data.SbAcSno || Number(data.SbAcSno) <= 0) setError('SbAcSno', 'Valid Account Sno is Required');
     if (!data.Amount || Number(data.Amount) <= 0) setError('Amount', 'Valid Amount is Required');
+    else if (Number(data.Amount) > this.availableBalance) setError('Amount', `Amount exceeds available balance (₹${this.availableBalance})`);
     if (!data.SeriesSno) setError('SeriesSno', 'Series Sno is Required');
 
     return isValid;
@@ -262,7 +309,11 @@ export class SavingsPaymentComponent implements OnInit {
   savePayment() {
     this.submitCount++;
     if (!this.validateFields()) {
-      this.globals.SnackBar('error', 'Please fill required fields');
+      if (this.errors['Amount'] && this.errors['Amount'].includes('available balance')) {
+        this.globals.SnackBar('error', this.errors['Amount']);
+      } else {
+        this.globals.SnackBar('error', 'Please fill required fields');
+      }
       return;
     }
 

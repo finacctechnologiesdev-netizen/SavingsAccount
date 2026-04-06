@@ -20,7 +20,7 @@
   </div>
 
   <div class="metric-card">
-    <span class="metric-label">Active RD Accounts</span>
+    <span class="metric-label">Active Savings Accounts</span>
     <div class="metric-value">{{ metrics.activeAccounts }}</div>
     <div class="metric-footer">
       <span class="tag">Running Deposits</span>
@@ -31,15 +31,15 @@
     <span class="metric-label">Total Collections</span>
     <div class="metric-value">₹{{ metrics.totalCollections | number:'1.0-2' }}</div>
     <div class="metric-footer">
-      <span class="tag">From all receipts</span>
+      <span class="tag">From Savings Receipts</span>
     </div>
   </div>
 
   <div class="metric-card">
-    <span class="metric-label">Total Maturity Paid</span>
+    <span class="metric-label">Total Payments</span>
     <div class="metric-value">₹{{ metrics.totalMaturity | number:'1.0-2' }}</div>
     <div class="metric-footer">
-      <span class="status-text">Via Closures</span>
+      <span class="status-text">Via Savings Payments</span>
     </div>
   </div>
 
@@ -54,7 +54,7 @@
   <div class="chart-section">
     <div class="chart-header">
       <div>
-        <h3 class="title">Collections vs Payouts</h3>
+        <h3 class="title">Collections vs Payments</h3>
         <div class="subtitle">Current Year Analysis</div>
       </div>
       <div class="chart-controls">
@@ -74,8 +74,8 @@
   <div class="action-section">
     <h3 class="title accent">Quick Actions</h3>
     <div class="actions-grid">
-      <button class="btn primary" (click)="navigate('dashboard/transactions/accounts/account')">New RD Account</button>
-      <button class="btn secondary" (click)="navigate('dashboard/transactions/receipts/receipt')">Collect
+      <button class="btn primary" (click)="navigate('dashboard/masters/saving-accounts/saving-account')">New Savings Account</button>
+      <button class="btn secondary" (click)="navigate('dashboard/transactions/savings-receipts/savings-receipt')">Savings
         Receipt</button>
       <button class="btn secondary" (click)="navigate('dashboard/masters/customers')">Add Customer</button>
     </div>
@@ -101,7 +101,6 @@
             <th>Type</th>
             <th>Receipt #</th>
             <th>Customer</th>
-            <th>Installments</th>
             <th>Amount</th>
             <th>Status</th>
           </tr>
@@ -113,14 +112,13 @@
             <td class="type-pawn">{{ txn.type }}</td>
             <td class="ref">{{ txn.ref }}</td>
             <td>{{ txn.customer }}</td>
-            <td>{{ txn.dueCount }}</td>
             <td class="amt">₹{{ txn.amount | number:'1.0-2' }}</td>
             <td><span class="badge active">RECEIVED</span></td>
           </tr>
           }
           @if (recentTransactions.length === 0) {
           <tr>
-            <td colspan="7" style="text-align: center; color: var(--muted-foreground)">No recent transactions</td>
+            <td colspan="6" style="text-align: center; color: var(--muted-foreground)">No recent transactions</td>
           </tr>
           }
         </tbody>

@@ -9,8 +9,7 @@ import { AccountTypesComponent } from './dashboard/components/masters/account-ty
 import { AccountTypeComponent } from './dashboard/components/masters/account-types/account-type/account-type.component';
 import { SavingAccountsComponent } from './dashboard/components/masters/saving-accounts/saving-accounts.component';
 import { SavingAccountComponent } from './dashboard/components/masters/saving-accounts/saving-account/saving-account.component';
-import { AccountsComponent } from './dashboard/components/transactions/accounts/accounts.component';
-import { AccountComponent } from './dashboard/components/transactions/accounts/account/account.component';
+
 import { SavingsReceiptsComponent } from './dashboard/components/transactions/savings-receipts/savings-receipts.component';
 import { SavingsReceiptComponent } from './dashboard/components/transactions/savings-receipts/savings-receipt/savings-receipt.component';
 import { SavingsPaymentsComponent } from './dashboard/components/transactions/savings-payments/savings-payments.component';
@@ -19,8 +18,7 @@ import { SavingsIntPostingsComponent } from './dashboard/components/transactions
 import { SavingsIntPostingComponent } from './dashboard/components/transactions/savings-int-postings/savings-int-posting/savings-int-posting.component';
 import { CustomersComponent } from './dashboard/components/masters/customers/customers.component';
 import { CustomerComponent } from './dashboard/components/masters/customers/customer/customer.component';
-import { ClosuresComponent } from './dashboard/components/transactions/closures/closures.component';
-import { ClosureComponent } from './dashboard/components/transactions/closures/closure/closure.component';
+
 import { CompaniesComponent } from './dashboard/components/settings/companies/companies.component';
 import { CompanyComponent } from './dashboard/components/settings/companies/company/company.component';
 import { VoucherSeriesesComponent } from './dashboard/components/settings/voucher-serieses/voucher-serieses.component';
@@ -30,7 +28,7 @@ import { ClientInfoComponent } from './dashboard/components/client-info/client-i
 import { RdHistoryComponent } from './dashboard/components/reports/rd-history/rd-history.component';
 import { PendingReportComponent } from './dashboard/components/reports/pending-report/pending-report.component';
 import { CustomerSummaryComponent } from './dashboard/components/reports/customer-summary/customer-summary.component';
-import { AccountSummaryComponent } from './dashboard/components/reports/account-summary/account-summary.component';
+import { SavingAccSummaryComponent } from './dashboard/components/reports/saving-acc-summary/saving-acc-summary.component';
 import { CompanySelectionComponent } from './dashboard/components/company-selection/company-selection.component';
 
 export const routes: Routes = [
@@ -78,15 +76,6 @@ export const routes: Routes = [
                     }
                 ]
             },
-            // Accounts Routes
-            {
-                path: 'transactions/accounts',
-                component: AccountsComponent
-            },
-            {
-                path: 'transactions/accounts/account',
-                component: AccountComponent
-            },
             // Receipts Routes
             {
                 path: 'transactions/savings-receipts',
@@ -124,15 +113,6 @@ export const routes: Routes = [
                         component: CustomerComponent
                     }
                 ]
-            },
-            // Closures Routes
-            {
-                path: 'transactions/closures',
-                component: ClosuresComponent
-            },
-            {
-                path: 'transactions/closures/closure',
-                component: ClosureComponent
             },
             // Settings Routes
             {
@@ -172,8 +152,8 @@ export const routes: Routes = [
                 component: CustomerSummaryComponent
             },
             {
-                path: 'reports/account-summary',
-                component: AccountSummaryComponent
+                path: 'reports/saving-acc-summary',
+                component: SavingAccSummaryComponent
             }
         ]
     }

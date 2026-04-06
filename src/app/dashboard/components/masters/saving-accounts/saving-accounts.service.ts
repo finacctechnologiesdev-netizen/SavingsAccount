@@ -13,8 +13,9 @@ export interface TypeSavingAccount {
     JointPartySno: number;
     RefPartySno: number;
     AcTypeSno: number;
+    Reference: string;
     Remarks: string;
-    CurrentRowVer?: string | null;
+    CurrentRowVer?: string | number | null;
     CreateDate?: any;
     IsActive: number;
     UserSno: number;
@@ -71,8 +72,14 @@ export class SavingAccountsService {
         }
         return this.api.get(this.getEndpoint, params).pipe(
             map((res: any) => {
-                const list = Array.isArray(res) ? res : [];
-                return list.map(account => this.parseAccountDetails(account));
+                let list = res;
+                if (res && res.apiData) {
+                    list = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
+                } else if (typeof res === 'string') {
+                    try { list = JSON.parse(res); } catch(e) {}
+                }
+                if (!Array.isArray(list)) list = [];
+                return list.map((account: any) => this.parseAccountDetails(account));
             })
         );
     }
@@ -120,8 +127,9 @@ export class SavingAccountsService {
             JointPartySno: 0,
             RefPartySno: 0,
             AcTypeSno: 0,
+            Reference: '',
             Remarks: '',
-            CurrentRowVer: null,
+            CurrentRowVer: 1,
             IsActive: 1,
             UserSno: 1,
             CompSno: Number(sessionStorage.getItem('CompSno'))

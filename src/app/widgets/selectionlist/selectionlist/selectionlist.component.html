@@ -7,6 +7,8 @@
     <input
       #InputBox
       type="text"
+      name="selectionInput_nope"
+      autocomplete="off"
       (focus)="DisplayList(); focused = true"
       (input)="sendTypedString($event)"
       (blur)="HideList()"

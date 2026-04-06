@@ -10,6 +10,7 @@ import { TransactionNumberService } from '../../../../../services/transaction-nu
 import { InputBehaviorDirective } from '../../../../../directives/input-behavior.directive';
 import { ChangeDetectorRef } from '@angular/core';
 import { SelectionlistComponent } from '../../../../../widgets/selectionlist/selectionlist/selectionlist.component';
+import { AccountTypesService } from '../../../masters/account-types/account-types.service';
 
 @Component({
   selector: 'app-savings-receipt',
@@ -30,7 +31,10 @@ export class SavingsReceiptComponent implements OnInit {
   accountsList: TypeSavingAccount[] = [];
   customersList: TypeCustomer[] = [];
   seriesList: any[] = [];
-  accountSummary: any = null;
+  currentBalance: number = 0;
+  minBalance: number = 0;
+  availableBalance: number = 0;
+  isBalanceLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -41,6 +45,7 @@ export class SavingsReceiptComponent implements OnInit {
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private transNumService: TransactionNumberService,
+    private acTypesService: AccountTypesService
   ) { }
 
   get selectedAccount(): TypeSavingAccount | undefined {
@@ -51,6 +56,13 @@ export class SavingsReceiptComponent implements OnInit {
     const account = this.selectedAccount;
     if (!account) return undefined;
     return this.customersList.find(c => Number(c.PartySno) === Number(account.PartySno));
+  }
+
+  get selectedAccountCategory(): string | undefined {
+    const acTypeVal = this.acTypesService.acTypesList.find((type: any) => type.AcTypeSno === this.selectedAccount?.AcTypeSno);
+    if (!acTypeVal) return undefined;
+    const cat = Number(acTypeVal.Ac_Category);
+    return cat === 1 ? 'Savings' : cat === 2 ? 'Current' : cat === 3 ? 'Other' : undefined;
   }
 
   get selectedJointCustomer(): TypeCustomer | undefined {
@@ -99,6 +111,7 @@ export class SavingsReceiptComponent implements OnInit {
     this.loadAccounts();
     this.loadCustomers();
     this.loadVoucherSeries();
+    this.loadAcTypes();
 
     const stateData = history.state.data;
     if (stateData) {
@@ -115,6 +128,25 @@ export class SavingsReceiptComponent implements OnInit {
       const today = new Date();
       this.Receipt.Receipt_Date = this.globals.formatDate(today, 'yyyy-MM-dd');
     }
+  }
+
+  loadAcTypes() {
+      if (this.acTypesService.acTypesList && this.acTypesService.acTypesList.length > 0) {
+          return;
+      }
+      this.acTypesService.getAcTypes().subscribe({
+          next: (res: any) => {
+              let list = res;
+              if (res && res.apiData) {
+                  list = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
+              } else if (typeof res === 'string') {
+                  try { list = JSON.parse(res); } catch(e) {}
+              }
+              if (!Array.isArray(list)) list = [];
+              this.acTypesService.acTypesList = list;
+          },
+          error: (err) => console.error(err)
+      });
   }
 
   loadAccounts() {
@@ -217,27 +249,41 @@ export class SavingsReceiptComponent implements OnInit {
 
   onAccountSelected() {
       if (this.Receipt.SbAcSno) {
-          this.receiptsService.getAccountSummary(this.Receipt.SbAcSno).subscribe({
+          const acType = this.acTypesService.acTypesList.find((type: any) => type.AcTypeSno === this.selectedAccount?.AcTypeSno);
+          this.minBalance = acType ? Number(acType.Min_Balance) || 0 : 0;
+          this.isBalanceLoading = true;
+          this.currentBalance = 0;
+          this.availableBalance = 0;
+          
+          const asOnDate = this.Receipt.Receipt_Date || this.globals.formatDate(new Date(), 'yyyy-MM-dd');
+          this.receiptsService.getSavingsCurrentBalance(this.Receipt.SbAcSno, asOnDate).subscribe({
               next: (res: any) => {
-                  let data = res;
-                  if (res && res.apiData) {
-                      data = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
+                  let bal = res;
+                  if (res && res.apiData !== undefined) {
+                      bal = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
                   } else if (typeof res === 'string') {
-                      try { data = JSON.parse(res); } catch(e) {}
+                      try { bal = JSON.parse(res); } catch(e) {}
                   }
-                  
-                  if (Array.isArray(data) && data.length > 0) {
-                      this.accountSummary = data[0];
-                  } else {
-                      this.accountSummary = null;
-                  }
+                  this.currentBalance = Number(bal) || 0;
+                  this.availableBalance = this.currentBalance - this.minBalance;
+                  this.isBalanceLoading = false;
                   this.cdr.detectChanges();
               },
-              error: (err) => console.error(err)
+              error: (err) => {
+                  console.error(err);
+                  this.isBalanceLoading = false;
+                  this.cdr.detectChanges();
+              }
           });
       } else {
-          this.accountSummary = null;
+          this.currentBalance = 0;
+          this.minBalance = 0;
+          this.availableBalance = 0;
       }
+  }
+
+  isBalanceLow(): boolean {
+      return this.availableBalance <= (this.minBalance * 0.1) || this.availableBalance <= 0;
   }
 
   validateFields(): boolean {

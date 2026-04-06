@@ -68,6 +68,7 @@ export class VoucherSeriesComponent implements OnInit {
     };
 
     if (!data.Series_Name) setError('Series_Name', 'Series Name is Required');
+    if (!data.VouType?.VouTypeSno || data.VouType.VouTypeSno === 0) setError('Voucher_Type', 'Voucher Type is Required');
     if (data.Start_No === null || data.Start_No === undefined) setError('Start_No', 'Start No is Required');
     if (data.Current_No === null || data.Current_No === undefined) setError('Current_No', 'Current No is Required');
 

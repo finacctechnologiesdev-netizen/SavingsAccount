@@ -70,10 +70,13 @@
   font-size: 1.6rem;
   cursor: pointer;
   color: var(--muted-foreground);
+  transition: transform 0.1s ease-in-out, color 0.1s ease-in-out;
 }
 .close-btn:hover {
   color: var(--foreground);
+  transform: scale(1.5);
 }
+
 
 .drawer-body {
   flex: 1;

@@ -59,7 +59,7 @@
     <div class="sidebar-footer">
       <div class="dropdown-divider"></div>
 
-      <div class="support-btn">
+      <div class="support-btn" (click)="toggleSupportPopup($event)">
         <!-- <span class="material-symbols-outlined">support_agent</span> -->
         <i class="bx bx-phone" style="font-size: 1.35rem;"></i>
         <span class="text">Support</span>
@@ -67,3 +67,42 @@
     </div>
   </aside>
 </div>
+
+<!-- Support Popup Modal -->
+@if(showSupportPopup) {
+<div class="support-popup-overlay" (click)="toggleSupportPopup()">
+  <div class="support-modal popup-entrance" (click)="$event.stopPropagation()">
+    <!-- Decorative background elements -->
+    <div class="deco-circle-1"></div>
+    <div class="deco-circle-2"></div>
+
+    <button class="close-modal-btn" (click)="toggleSupportPopup()">
+      <i class="bx bx-x"></i>
+    </button>
+    
+    <div class="modal-header">
+      <div class="icon-pulse-wrapper">
+        <img src="assets/images/finacclogo.png" alt="FinAcc Logo" class="support-logo" />
+      </div>
+      <h2>We're Here to Help!</h2>
+      <p>Have any queries, suggestions, or need immediate assistance? Reach out to our dedicated support team.</p>
+    </div>
+
+    <div class="modal-actions-container">
+      <a href="tel:+919894027970" class="contact-number-box call-action">
+        <div class="icon-circle">
+          <i class="bx bx-phone-call"></i>
+        </div>
+        <div class="call-text">
+          <span class="label">Call Us</span>
+          <span class="number">+91 98940 27970</span>
+        </div>
+      </a>
+
+      <a href="https://wa.me/919894027970" target="_blank" class="btn-support btn-whatsapp">
+        <i class="bx bxl-whatsapp"></i> Chat on WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+}

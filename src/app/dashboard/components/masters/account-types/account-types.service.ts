@@ -7,24 +7,15 @@ export interface TypeAcType {
     AcTypeSno?: number; 
     AcType_Code: string;
     AcType_Name: string;
-    Min_Balance: number | string;
-    Roi: number | string;
-    Ac_Category: number;
+    Min_Balance: number | string;  
+    Roi: number | string;  
+    Ac_Category: number | string;
     Remarks: string;
     CurrentRowVer?: string | null;
     CreateDate?: any;
     IsActive: number;
     UserSno: number;
     CompSno: number;
-
-    RdSchemeSno?: any;
-    RdScheme_Code?: any;
-    RdScheme_Name?: any;
-    DueAmount?: any;
-    Due_Period?: any;
-    Maturity_Amount?: any;
-    Due_Frequency?: any;
-    Default_Charges?: any;
 }
 
 @Injectable({
@@ -37,11 +28,6 @@ export class AccountTypesService {
     private readonly crudEndpoint = 'app/crudAcType';
 
     public acTypesList: TypeAcType[] = [];
-
-    // Legacy aliases for compilation (will be removed when migrating transactions)
-    get schemesList() { return this.acTypesList; }
-    set schemesList(val) { this.acTypesList = val; }
-    getSchemes() { return this.getAcTypes(); }
 
     getAcTypes(): Observable<TypeAcType[]> {
         const params = {
@@ -92,8 +78,8 @@ export class AccountTypesService {
             AcTypeSno: 0,
             AcType_Code: '',
             AcType_Name: '',
-            Min_Balance: '',
-            Roi: '',
+            Min_Balance: 0,
+            Roi: 0,
             Ac_Category: 1, // Defaulting to Savings Account assuming 1
             Remarks: '',
             CurrentRowVer: '',

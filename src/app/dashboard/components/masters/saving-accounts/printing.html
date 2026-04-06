@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Account</title>
+    <style>        
+        @page {
+            size: letter;
+            margin: 0;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: white;
+            font-family: "Times New Roman", Times, serif;
+            color: #000;
+        }
+
+        * {
+            padding: 0px;
+            margin: 0;
+            font-family: inherit;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            max-width: 800px;
+            gap: 12px;
+        }
+
+        .Htext {
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            color: #000;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .item {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .item h3 {
+            font-size: 13px;
+            color: #000;
+            min-width: 180px;
+            font-weight: normal;
+        }
+
+        .item h4 {
+            color: #000;
+            font-weight: normal;
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .inner-item {
+            display: flex;
+            align-items: flex-start;
+            flex: 1;
+        }
+
+        .inner-item h3 {
+            font-size: 13px;
+            color: #000;
+            min-width: 140px;
+            font-weight: normal;
+        }
+
+        .inner-item h4 {
+            color: #000;
+            font-weight: normal;
+            font-size: 13px;
+            flex: 1;
+        }
+        .address{
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body class="center">
+   <div class="container">
+    <h1 class="Htext">Salem yourspay capital limited</h1>
+
+    <div style="margin-top: 7px;" class="item">
+        <div class="inner-item">
+            <h3>Name:</h3>
+            <h4>${customer.Party_Name}</h4>
+        </div>
+        <div class="inner-item">
+            <h3>Type:</h3>
+            <h4>${account.JointPartySno > 0 ? 'Joint Account' : 'Individual Account'} </h4>
+        </div>
+    </div>
+
+        <div class="item">
+            <div class="inner-item">
+                <h3>Member ID:</h3>
+                <h4>${customer.Party_Code}</h4>
+            </div>
+            <div class="inner-item">
+                <h3>Mobile:</h3>
+                <h4>${customer.Mobile || '--'}</h4>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="inner-item">
+                <h3>Account No:</h3>
+                <h4>${account.SbAccount_No}</h4>
+            </div>
+            <div class="inner-item">
+                <h3>Nominee:</h3>
+                <h4>${customer.Nominee?.trim().length > 0 ? customer.Nominee : 'NIL'}</h4>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="inner-item">
+                <h3>Account Category:</h3>
+                <h4>${accountCategory} (${accountTypeName})</h4>
+            </div>
+            <div class="inner-item">
+                <h3>Aadhaar No:</h3>
+                <h4>${customer.Aadhar_No || '--'}</h4>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="inner-item">
+                <h3>Account Opened date:</h3>
+                <h4>${account.CreateDate}</h4>
+            </div>
+            <div class="inner-item">
+                <h3>PAN No:</h3>
+                <h4>${customer.Pancard_No || '--'}</h4>
+            </div>
+        </div>
+
+        <div class="address">
+          <div class="inner-item">
+              <h3>Address:</h3>
+              <h4>${customer.Address1} ${customer.Address2 ? ',' : ''} ${customer.Address2} ${customer.Address3 ? ',' : ''} ${customer.Address3}</h4>
+          </div>
+          <div class="inner-item" style="margin-top: -10px; margin-left: 140px;">
+            <h4>${customer.City} ${customer.Pincode}</h4>
+          </div>
+        </div>
+    </div>
+</body>
+</html>

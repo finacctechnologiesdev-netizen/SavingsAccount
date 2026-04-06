@@ -36,9 +36,9 @@ export interface TypeCustomer {
     Nominee_Aadhar: string;
     Remarks: string;
     Occupation: string;
-    Monthly_Income: number | string;
+    Monthly_Income: number ; // | string
     MaxLoans: number;
-    Loan_Value_Limit: number | string;
+    Loan_Value_Limit: number;  // | string
     Allow_More_Value: number;
     Verify_Code: string;
     Verify_Status: number;
@@ -87,6 +87,19 @@ export class CustomersService {
                 PartySno: 0,
                 CompSno: sessionStorage.getItem('CompSno'),
             })
+        }
+
+        return this.api.get(this.getEndpoint, params);
+    }
+
+    getCustomer(partysno:number):Observable<TypeCustomer[]>{
+        const params = {
+            data: JSON.stringify(
+                {
+                    PartySno: partysno,
+                    CompSno: sessionStorage.getItem('CompSno'),
+                }
+            )
         }
 
         return this.api.get(this.getEndpoint, params);

@@ -22,13 +22,27 @@
       <div class="form-section">
         <h6 class="group-label">Basic Information</h6>
         <div class="form-row">
-          <div class="input-container flex-2">
+          <div class="input-container flex-1">
             <input type="text" id="Series_Name" name="Series_Name" [(ngModel)]="Series.Series_Name"
               (blur)="submitCount > 0 ? validateFields() : null"
               [class.error]="submitCount > 0 && errors['Series_Name']" placeholder=" " />
             <label for="Series_Name">Series Name <span class="req">*</span></label>
             @if (submitCount > 0 && errors["Series_Name"]) {
             <span class="error-msg">{{ errors["Series_Name"] }}</span>
+            }
+          </div>
+
+          <div class="input-container flex-1">
+            <select id="Voucher_Type" name="Voucher_Type" [(ngModel)]="Series.VouType.VouTypeSno"
+              (blur)="submitCount > 0 ? validateFields() : null" [class.error]="submitCount > 0 && errors['Voucher_Type']">
+              <option [ngValue]="0" disabled hidden>Select Type</option>
+              <option [ngValue]="27">Savings Receipt</option>
+              <option [ngValue]="28">Savings Payment</option>
+              <option [ngValue]="29">Savings Int. Posting</option>
+            </select>
+            <label for="Voucher_Type">Voucher Type <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["Voucher_Type"]) {
+            <span class="error-msg">{{ errors["Voucher_Type"] }}</span>
             }
           </div>
 

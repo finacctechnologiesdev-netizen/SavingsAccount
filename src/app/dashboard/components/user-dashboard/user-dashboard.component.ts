@@ -6,10 +6,10 @@ import { EChartsOption } from 'echarts';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 
-import { AccountsService, TypeAccount } from '../transactions/accounts/accounts.service';
-import { ReceiptsService, TypeReceipt } from '../transactions/receipts/receipts.service';
-import { ClosuresService, TypeClosure } from '../transactions/closures/closures.service';
-import { CustomersService, TypeCustomer } from '../masters/customers/customers.service';
+import { SavingAccountsService } from '../masters/saving-accounts/saving-accounts.service';
+import { SavingsReceiptsService } from '../transactions/savings-receipts/savings-receipts.service';
+import { SavingsPaymentsService } from '../transactions/savings-payments/savings-payments.service';
+import { CustomersService } from '../masters/customers/customers.service';
 import { GlobalService } from '../../../services/global.service';
 
 @Component({
@@ -42,35 +42,35 @@ export class UserDashboardComponent implements OnInit {
   private rawData: any = null;
 
   constructor(
-    public accountsService: AccountsService,
-    public receiptsService: ReceiptsService,
-    public closuresService: ClosuresService,
+    public accountsService: SavingAccountsService,
+    public receiptsService: SavingsReceiptsService,
+    public paymentsService: SavingsPaymentsService,
     public customersService: CustomersService,
     public globals: GlobalService,
     private router: Router
   ) { }
 
   ngOnInit() {
-    this.updateMainChart(); // init empty chart
+    this.updateMainChart(); 
     this.loadData();
   }
 
   loadData() {
     const accounts$ = this.accountsService.accountsList.length ? of(this.accountsService.accountsList) : this.accountsService.getAccounts();
     const receipts$ = this.receiptsService.receiptsList.length ? of(this.receiptsService.receiptsList) : this.receiptsService.getReceipts();
-    const closures$ = this.closuresService.closuresList.length ? of(this.closuresService.closuresList) : this.closuresService.getClosures();
+    const payments$ = this.paymentsService.paymentsList.length ? of(this.paymentsService.paymentsList) : this.paymentsService.getPayments();
     const customers$ = this.customersService.customersList.length ? of(this.customersService.customersList) : this.customersService.getCustomers();
 
     forkJoin({
       accounts: accounts$,
       receipts: receipts$,
-      closures: closures$,
+      payments: payments$,
       customers: customers$
     }).subscribe({
       next: (res) => {
         this.accountsService.accountsList = res.accounts || [];
         this.receiptsService.receiptsList = res.receipts || [];
-        this.closuresService.closuresList = res.closures || [];
+        this.paymentsService.paymentsList = res.payments || [];
         this.customersService.customersList = res.customers || [];
 
         this.rawData = res;
@@ -121,10 +121,10 @@ export class UserDashboardComponent implements OnInit {
     };
 
     const filteredData = {
-      accounts: (this.rawData.accounts || []).filter((a: any) => isDateInRange(a.Account_Date)),
+      accounts: (this.rawData.accounts || []).filter((a: any) => isDateInRange(a.CreateDate)),
       receipts: (this.rawData.receipts || []).filter((r: any) => isDateInRange(r.Receipt_Date)),
-      closures: (this.rawData.closures || []).filter((c: any) => isDateInRange(c.Closure_Date)),
-      customers: this.rawData.customers // Keep base customers to map names correctly, metrics handle the rest filtering
+      payments: (this.rawData.payments || []).filter((c: any) => isDateInRange(c.Payment_Date)),
+      customers: this.rawData.customers 
     };
 
     this.calculateMetrics(filteredData);
@@ -134,25 +134,20 @@ export class UserDashboardComponent implements OnInit {
   }
 
   calculateMetrics(filteredData: any) {
-    // For overall stats, always use rawData to ignore date filters
     const allAccounts = this.rawData?.accounts || filteredData.accounts || [];
     const allCustomers = this.rawData?.customers || filteredData.customers || [];
 
-    // Extract unique PartySno from all available accounts
     const uniqueCustomerIdsWithAccounts = new Set(allAccounts.map((a: any) => a.PartySno));
 
-    // Only count active customers who actually have an account (Overall)
     this.metrics.totalCustomers = allCustomers.filter(
       (c: any) => c.Active_Status === 1 && uniqueCustomerIdsWithAccounts.has(c.PartySno)
     ).length;
 
-    // Active accounts is overall without filter
     this.metrics.activeAccounts = allAccounts.filter((a: any) => a.IsActive === 1).length;
     
-    // Financials apply the requested date filter
     this.metrics.totalCollections = (filteredData.receipts || []).reduce((sum: number, r: any) => sum + (Number(r.Amount) || 0), 0);
-    this.metrics.totalMaturity = (filteredData.closures || []).reduce((sum: number, c: any) => {
-         return sum + (Number(c.Total_Amount) || 0);
+    this.metrics.totalMaturity = (filteredData.payments || []).reduce((sum: number, c: any) => {
+         return sum + (Number(c.Amount) || 0);
     }, 0);
     
     this.metrics.liquidity = this.metrics.totalCollections - this.metrics.totalMaturity;
@@ -181,7 +176,7 @@ export class UserDashboardComponent implements OnInit {
     };
 
     (data.receipts || []).forEach((r: any) => processDate(r, 'Receipt_Date', collections, 'Amount'));
-    (data.closures || []).forEach((c: any) => processDate(c, 'Closure_Date', payouts, 'Total_Amount'));
+    (data.payments || []).forEach((c: any) => processDate(c, 'Payment_Date', payouts, 'Amount'));
 
     this.chartData.collections = collections;
     this.chartData.payouts = payouts;
@@ -197,7 +192,7 @@ export class UserDashboardComponent implements OnInit {
         borderWidth: 0
       },
       legend: {
-        data: ['Collections', 'Maturity Payouts'],
+        data: ['Collections', 'Payments'],
         top: 0,
         right: 0,
         textStyle: { color: '#6b7280', fontSize: 12 }
@@ -244,7 +239,7 @@ export class UserDashboardComponent implements OnInit {
           showSymbol: false
         },
         {
-          name: 'Maturity Payouts',
+          name: 'Payments',
           type: this.activeChartType,
           smooth: true,
           data: this.chartData.payouts ,
@@ -265,7 +260,7 @@ export class UserDashboardComponent implements OnInit {
       .slice(0, 5);
 
     this.recentTransactions = receipts.map((r: any) => {
-      const account = (data.accounts || []).find((a: any) => a.RdAccountSno === r.RdAccountSno);
+      const account = (data.accounts || []).find((a: any) => a.SbAcSno === r.SbAcSno);
       const customer = account ? (data.customers || []).find((c: any) => c.PartySno === account.PartySno) : null;
       
       return {
@@ -273,41 +268,13 @@ export class UserDashboardComponent implements OnInit {
         type: 'RECEIPT',
         ref: r.Receipt_No,
         customer: customer?.Party_Name || 'Unknown',
-        amount: r.Amount,
-        dueCount: r.DueCount
+        amount: r.Amount
       };
     });
   }
 
   prepareAlerts(data: any) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const upcoming = (data.accounts || [])
-      .filter((a: any) => a.IsActive === 1 && a.Mature_Date)
-      .map((a: any) => {
-        const dStr = typeof a.Mature_Date === 'object' ? a.Mature_Date.date : a.Mature_Date;
-        const mDate = new Date(dStr);
-        mDate.setHours(0, 0, 0, 0);
-        return {
-          ...a,
-          daysToMaturity: Math.ceil((mDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-        };
-      })
-      .filter((a: any) => a.daysToMaturity >= 0)
-      .sort((a: any, b: any) => a.daysToMaturity - b.daysToMaturity);
-
-    if (upcoming.length > 0) {
-      const acc = upcoming[0];
-      const customer = (data.customers || []).find((c: any) => c.PartySno === acc.PartySno);
-
-      this.nextMaturity = {
-        ref: acc.Account_No,
-        customer: customer?.Party_Name || 'Unknown',
-        days: acc.daysToMaturity,
-        amount: acc.Mature_Amount
-      };
-    }
+     this.nextMaturity = null;
   }
 
   navigate(path: string) {

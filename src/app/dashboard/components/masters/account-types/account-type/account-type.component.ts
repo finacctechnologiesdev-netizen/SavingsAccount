@@ -45,44 +45,54 @@ export class AccountTypeComponent implements OnInit {
         } else {
           this.AcType.CreateDate = this.datePipe.transform(new Date(this.AcType.CreateDate), 'yyyy-MM-dd') || '';
         }
+
+        if (this.AcType.Ac_Category !== undefined && this.AcType.Ac_Category !== null) {
+          if (this.AcType.Ac_Category == "Savings" || this.AcType.Ac_Category == 1) {
+            this.AcType.Ac_Category = 1;
+          } else if (this.AcType.Ac_Category == "Current" || this.AcType.Ac_Category == 2) {
+            this.AcType.Ac_Category = 2;
+          } else {
+            this.AcType.Ac_Category = 3;
+          }
+        }
       }
     } else {
       this.isEditMode = false;
       this.AcType = this.acTypesService.initializeAcType();
     }
 
-    this.loadAppSetup();
+    //this.loadAppSetup();
   }
 
-  loadAppSetup(): void {
-    this.appsetupService.getRdSetup().subscribe({
-      next: (res: any) => {
-        let data = res;
-        if (res && res.apiData) {
-          data = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
-        } else if (typeof res === 'string') {
-          try { data = JSON.parse(res); } catch (e) {}
-        }
-        const setup = Array.isArray(data) ? data[0] : data;
-        if (setup) {
-          this.applyAcTypeCodeAutoGen(Number(setup.SchemeCode_AutoGen));
-        }
-      },
-      error: (err) => console.error('Failed to load AppSetup', err)
-    });
-  }
+  // loadAppSetup(): void {
+  //   this.appsetupService.getRdSetup().subscribe({
+  //     next: (res: any) => {
+  //       let data = res;
+  //       if (res && res.apiData) {
+  //         data = typeof res.apiData === 'string' ? JSON.parse(res.apiData) : res.apiData;
+  //       } else if (typeof res === 'string') {
+  //         try { data = JSON.parse(res); } catch (e) { }
+  //       }
+  //       const setup = Array.isArray(data) ? data[0] : data;
+  //       if (setup) {
+  //         this.applyAcTypeCodeAutoGen(Number(setup.SchemeCode_AutoGen));
+  //       }
+  //     },
+  //     error: (err) => console.error('Failed to load AppSetup', err)
+  //   });
+  // }
 
-  applyAcTypeCodeAutoGen(autoGenMode: number): void {
-    if (autoGenMode === 1) {
-      this.isAcTypeCodeDisabled = true;
-      if (!this.isEditMode) {
-        this.AcType.AcType_Code = 'Auto';
-      }
-    } else {
-      this.isAcTypeCodeDisabled = false;
-    }
-    this.cdr.detectChanges();
-  }
+  // applyAcTypeCodeAutoGen(autoGenMode: number): void {
+  //   if (autoGenMode === 1) {
+  //     this.isAcTypeCodeDisabled = true;
+  //     if (!this.isEditMode) {
+  //       this.AcType.AcType_Code = 'Auto';
+  //     }
+  //   } else {
+  //     this.isAcTypeCodeDisabled = false;
+  //   }
+  //   this.cdr.detectChanges();
+  // }
 
 
   validateFields(): boolean {
@@ -123,9 +133,10 @@ export class AccountTypeComponent implements OnInit {
     payload.IsActive = (payload.IsActive === true || payload.IsActive === 1) ? 1 : 0;
 
     payload.AcTypeSno = Number(payload.AcTypeSno || 0);
-    payload.Min_Balance = Number(payload.Min_Balance || 0);
-    payload.Roi = Number(payload.Roi || 0);
+    // payload.Min_Balance = Number(payload.Min_Balance || 0);
+    // payload.Roi = Number(payload.Roi || 0);
     payload.Ac_Category = Number(payload.Ac_Category || 1);
+    console.log(payload);
 
     if (this.isEditMode) {
       payload.AcTypeSno = this.AcType.AcTypeSno;
@@ -135,13 +146,14 @@ export class AccountTypeComponent implements OnInit {
       }
     } else {
       payload.UserSno = 1;
-      payload.CompSno = 1;
+      payload.CompSno = Number(sessionStorage.getItem('CompSno')) || 1;
       delete payload.CurrentRowVer;
       delete payload.CreateDate;
     }
 
-    this.acTypesService.crudAcType(action, payload).subscribe({
+    this.acTypesService.crudAcType(action, payload).subscribe({     
       next: (res: any) => {
+        console.log(res);
         if (res.Status === 'Success' || res.queryStatus === 1) {
           this.globals.SnackBar('success', this.isEditMode ? 'Account type updated successfully' : 'Account type created successfully');
 
@@ -153,7 +165,7 @@ export class AccountTypeComponent implements OnInit {
             this.acTypesService.updateAcType(this.AcType);
           } else {
             if (res.RetSno) {
-              this.AcType.AcTypeSno = res.RetSno; 
+              this.AcType.AcTypeSno = res.RetSno;
             }
             this.acTypesService.addAcType(this.AcType);
           }
