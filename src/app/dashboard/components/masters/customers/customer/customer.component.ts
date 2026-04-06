@@ -92,6 +92,10 @@ export class CustomerComponent implements OnInit {
       setError('Nominee_Aadhar', 'Must be exactly 12 digits');
     }
 
+    if (data.Nominee_Mobile && !/^\d{10}$/.test(data.Nominee_Mobile)) {
+      setError('Nominee_Mobile', 'Must be exactly 10 digits');
+    }
+
     // PAN Validation
     if (data.Pancard_No && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(data.Pancard_No)) {
       setError('Pancard_No', 'Invalid PAN format');

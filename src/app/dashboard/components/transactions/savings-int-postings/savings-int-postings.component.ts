@@ -57,7 +57,7 @@ export class SavingsIntPostingsComponent implements OnInit {
   }
 
   loadData() {
-    const receiptsObs = this.intPostingsService.intPostingsList.length > 0 
+    const intPostingsObs = this.intPostingsService.intPostingsList.length > 0 
       ? of(this.intPostingsService.intPostingsList) 
       : this.intPostingsService.getIntPostings();
       
@@ -70,25 +70,25 @@ export class SavingsIntPostingsComponent implements OnInit {
       : this.customersService.getCustomers();
 
     forkJoin({
-      intPostings: receiptsObs,
+      intPostings: intPostingsObs,
       accounts: accountsObs,
       customers: customersObs
     }).subscribe({
       next: (res: any) => {
-        let rcptList = res.intPostings;
+        let intPostingsList = res.intPostings;  
         if (res.intPostings && res.intPostings.apiData) {
-            rcptList = typeof res.intPostings.apiData === 'string' ? JSON.parse(res.intPostings.apiData) : res.intPostings.apiData;
+            intPostingsList = typeof res.intPostings.apiData === 'string' ? JSON.parse(res.intPostings.apiData) : res.intPostings.apiData;
         } else if (typeof res.intPostings === 'string') {
-            try { rcptList = JSON.parse(res.intPostings); } catch(e) {}
+            try { intPostingsList = JSON.parse(res.intPostings); } catch(e) {}
         }
-        if (!Array.isArray(rcptList)) rcptList = [];
+        if (!Array.isArray(intPostingsList)) intPostingsList = [];
 
-        this.intPostingsService.intPostingsList = rcptList;
+        this.intPostingsService.intPostingsList = intPostingsList;
         // Assume accounts and customers bindings natively handled by auth cache logic for brevity if needed
         this.accountsService.accountsList = res.accounts;
         this.customersService.customersList = res.customers;
 
-        this.updateDataSource(rcptList);
+        this.updateDataSource(intPostingsList);
       },
       error: (err) => {
         console.error('Network Error', err);

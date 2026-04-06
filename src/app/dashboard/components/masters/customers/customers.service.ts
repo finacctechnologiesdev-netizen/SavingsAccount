@@ -17,6 +17,7 @@ export interface TypeCustomer {
     Address2: string;
     Address3: string;
     Address4: string;
+    Communication_Address: string;
     City: string;
     State: string;
     Pincode: string;
@@ -34,6 +35,7 @@ export interface TypeCustomer {
     Nominee: string;
     Nominee_Rel: string;
     Nominee_Aadhar: string;
+    Nominee_Mobile: string;
     Remarks: string;
     Occupation: string;
     Monthly_Income: number ; // | string
@@ -153,6 +155,7 @@ export class CustomersService {
             Address2: '',
             Address3: '',
             Address4: '',
+            Communication_Address: '',
             City: '',
             State: '',
             Pincode: '',
@@ -170,6 +173,7 @@ export class CustomersService {
             Nominee: '',
             Nominee_Rel: '',
             Nominee_Aadhar: '',
+            Nominee_Mobile: '',
             Remarks: '',
             Occupation: '',
             Monthly_Income: 0,

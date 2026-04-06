@@ -7,8 +7,10 @@ import { DatePipe } from '@angular/common';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withPreloading(PreloadAllModules), withHashLocation()),
+    provideRouter(routes,  withHashLocation()),
     provideHttpClient(),
     DatePipe
   ],
 };
+
+//withPreloading(PreloadAllModules),

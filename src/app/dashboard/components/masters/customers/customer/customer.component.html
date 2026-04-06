@@ -273,6 +273,16 @@
                   <span class="error-msg">{{ errors["Email"] }}</span>
                 }
               </div>
+              <div class="input-container w-50">
+                <input
+                  type="text"
+                  id="Communication_Address"
+                  name="Communication_Address"
+                  [(ngModel)]="Customer.Communication_Address"
+                  placeholder=" "
+                />
+                <label for="Communication_Address">Communication Address</label>
+              </div>
             </div>
           }
 
@@ -385,6 +395,28 @@
                 <label for="Nominee_Aadhar">Nominee Aadhar</label>
                 @if (submitCount > 0 && errors["Nominee_Aadhar"]) {
                   <span class="error-msg">{{ errors["Nominee_Aadhar"] }}</span>
+                }
+              </div>
+            </div>
+            <div class="row-flex">
+              <div class="input-container w-50">
+                <input
+                  type="text"
+                  id="Nominee_Mobile"
+                  name="Nominee_Mobile"
+                  [(ngModel)]="Customer.Nominee_Mobile"
+                  placeholder=" "
+                  maxlength="10"
+                  (keypress)="globals.isNumberKey($event)"
+                  (input)="
+                    Customer.Nominee_Mobile = globals.filterNumbers($event)
+                  "
+                  (blur)="submitCount > 0 ? validateFields() : null"
+                  [class.error]="submitCount > 0 && errors['Nominee_Mobile']"
+                />
+                <label for="Nominee_Mobile">Nominee Mobile</label>
+                @if (submitCount > 0 && errors["Nominee_Mobile"]) {
+                  <span class="error-msg">{{ errors["Nominee_Mobile"] }}</span>
                 }
               </div>
             </div>

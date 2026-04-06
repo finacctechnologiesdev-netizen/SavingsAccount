@@ -19,15 +19,12 @@ import { SavingsIntPostingComponent } from './dashboard/components/transactions/
 import { CustomersComponent } from './dashboard/components/masters/customers/customers.component';
 import { CustomerComponent } from './dashboard/components/masters/customers/customer/customer.component';
 
-import { CompaniesComponent } from './dashboard/components/settings/companies/companies.component';
-import { CompanyComponent } from './dashboard/components/settings/companies/company/company.component';
+
 import { VoucherSeriesesComponent } from './dashboard/components/settings/voucher-serieses/voucher-serieses.component';
 import { VoucherSeriesComponent } from './dashboard/components/settings/voucher-serieses/voucher-series/voucher-series.component';
 import { AppsetupComponent } from './dashboard/components/settings/appsetup/appsetup.component';
 import { ClientInfoComponent } from './dashboard/components/client-info/client-info.component';
-import { RdHistoryComponent } from './dashboard/components/reports/rd-history/rd-history.component';
-import { PendingReportComponent } from './dashboard/components/reports/pending-report/pending-report.component';
-import { CustomerSummaryComponent } from './dashboard/components/reports/customer-summary/customer-summary.component';
+
 import { SavingAccSummaryComponent } from './dashboard/components/reports/saving-acc-summary/saving-acc-summary.component';
 import { CompanySelectionComponent } from './dashboard/components/company-selection/company-selection.component';
 
@@ -54,75 +51,84 @@ export const routes: Routes = [
                 path: 'user-dashboard',
                 component: UserDashboardComponent
             },
-            // Account Types Routes
             {
-                path: 'masters/account-types',
-                component: AccountTypesComponent,
-                children: [
-                    {
-                        path: 'account-type',
-                        component: AccountTypeComponent
-                    }
-                ]
+                path: 'masters',
+                loadChildren: () =>
+                    import('./dashboard/components/masters/masters.routes')   // ✅ loads masters routes lazily
+                        .then(m => m.MASTER_ROUTES)
             },
-            // Saving Accounts Routes
+
+
+            // // Account Types Routes
+            // {
+            //     path: 'masters/account-types',
+            //     component: AccountTypesComponent,
+            //     children: [
+            //         {
+            //             path: 'account-type',
+            //             component: AccountTypeComponent
+            //         }
+            //     ]
+            // },
+            // // Saving Accounts Routes
+            // {
+            //     path: 'masters/saving-accounts',
+            //     component: SavingAccountsComponent,
+            //     children: [
+            //         {
+            //             path: 'saving-account',
+            //             component: SavingAccountComponent
+            //         }
+            //     ]
+            // },
+            //             // Customers Routes
+            // {
+            //     path: 'masters/customers',
+            //     component: CustomersComponent,
+            //     children: [
+            //         {
+            //             path: 'customer',
+            //             component: CustomerComponent
+            //         }
+            //     ]
+            // },
+
+
             {
-                path: 'masters/saving-accounts',
-                component: SavingAccountsComponent,
-                children: [
-                    {
-                        path: 'saving-account',
-                        component: SavingAccountComponent
-                    }
-                ]
+                path: 'transactions',
+                loadChildren: () =>
+                    import('./dashboard/components/transactions/transactions.routes')   // ✅ loads transactions routes lazily
+                        .then(m => m.TRANSACTIONS_ROUTES)
             },
-            // Receipts Routes
-            {
-                path: 'transactions/savings-receipts',
-                component: SavingsReceiptsComponent
-            },
-            {
-                path: 'transactions/savings-receipts/savings-receipt',
-                component: SavingsReceiptComponent
-            },
-            // Payments Routes
-            {
-                path: 'transactions/savings-payments',
-                component: SavingsPaymentsComponent
-            },
-            {
-                path: 'transactions/savings-payments/savings-payment',
-                component: SavingsPaymentComponent
-            },
-            // Interest Postings Routes
-            {
-                path: 'transactions/savings-int-postings',
-                component: SavingsIntPostingsComponent
-            },
-            {
-                path: 'transactions/savings-int-postings/savings-int-posting',
-                component: SavingsIntPostingComponent
-            },
-            // Customers Routes
-            {
-                path: 'masters/customers',
-                component: CustomersComponent,
-                children: [
-                    {
-                        path: 'customer',
-                        component: CustomerComponent
-                    }
-                ]
-            },
+            // // Receipts Routes
+            // {
+            //     path: 'transactions/savings-receipts',
+            //     component: SavingsReceiptsComponent
+            // },
+            // {
+            //     path: 'transactions/savings-receipts/savings-receipt',
+            //     component: SavingsReceiptComponent
+            // },
+            // // Payments Routes
+            // {
+            //     path: 'transactions/savings-payments',
+            //     component: SavingsPaymentsComponent
+            // },
+            // {
+            //     path: 'transactions/savings-payments/savings-payment',
+            //     component: SavingsPaymentComponent
+            // },
+            // // Interest Postings Routes
+            // {
+            //     path: 'transactions/savings-int-postings',
+            //     component: SavingsIntPostingsComponent
+            // },
+            // {
+            //     path: 'transactions/savings-int-postings/savings-int-posting',
+            //     component: SavingsIntPostingComponent
+            // },
             // Settings Routes
-            {
-                path: 'settings/companies',
-                component: CompaniesComponent
-            },
-            {
-                path: 'settings/companies/company',
-                component: CompanyComponent
-            },
+  
             {
                 path: 'settings/voucher-serieses',
                 component: VoucherSeriesesComponent
@@ -138,18 +144,6 @@ export const routes: Routes = [
             {
                 path: 'client-info',
                 component: ClientInfoComponent
-            },
-            {
-                path: 'reports/rd-history',
-                component: RdHistoryComponent
-            },
-            {
-                path: 'reports/pending-report',
-                component: PendingReportComponent
-            },
-            {
-                path: 'reports/customer-summary',
-                component: CustomerSummaryComponent
             },
             {
                 path: 'reports/saving-acc-summary',
