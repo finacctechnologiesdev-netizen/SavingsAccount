@@ -54,4 +54,10 @@ export class CompanySelectionComponent implements OnInit {
   closeModal(): void {
     this.close.emit();
   }
+
+  onOverlayClick(): void {
+    if (this.canClose) {
+      this.closeModal();
+    }
+  }
 }

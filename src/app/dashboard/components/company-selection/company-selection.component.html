@@ -1,18 +1,18 @@
-<div class="modal-overlay" >
-  <div class="modal-content company-modal">
+<div class="modal-overlay" (click)="onOverlayClick()">
+  <div class="modal-content company-modal" (click)="$event.stopPropagation()">
     <!-- Header -->
     <div class="modal-header">
       <div class="title-with-icon">
         <i class="bx bx-buildings"></i>
         <h2>Companies List</h2>
       </div>
-      <button class="close-btn" *ngIf="canClose" (click)="closeModal()">
+      <button class="close-btn" *ngIf="canClose" (click)="closeModal()" title="Cancel">
         <i class="bx bx-x"></i>
       </button>
     </div>
 
     <!-- Table content -->
-    <div class="modal-body">
+    <div class="modal-body ">
       <div class="native-table-container">
         <table class="native-data-table company-table">
           <thead>

@@ -11,33 +11,27 @@ export const TRANSACTIONS_ROUTES: Routes = [
     {
         path: 'savings-receipts',
         component: SavingsReceiptsComponent,
-        children: [
-            {
-                path: 'savings-receipt',
-                component: SavingsReceiptComponent
-            }
-        ]
+    },
+    {
+        path: 'savings-receipts/savings-receipt',
+        component: SavingsReceiptComponent
     },
     // Payments Routes
     {
         path: 'savings-payments',
         component: SavingsPaymentsComponent,
-        children: [
-            {
-                path: 'savings-payment',
-                component: SavingsPaymentComponent
-            }
-        ]
+    },
+    {
+        path: 'savings-payments/savings-payment',
+        component: SavingsPaymentComponent
     },
     // Interest Postings Routes
     {
         path: 'savings-int-postings',
         component: SavingsIntPostingsComponent,
-        children: [
-            {
-                path: 'savings-int-posting',
-                component: SavingsIntPostingComponent
-            }
-        ]
+    },
+    {
+        path: 'savings-int-postings/savings-int-posting',
+        component: SavingsIntPostingComponent
     },
 ];

@@ -69,8 +69,23 @@ export class CustomerComponent implements OnInit {
    // if (!data.Dob) setError('Dob', 'DOB is Required');
     
     // Alternative Phone Validation
-    if (data.Phone && !/^\d{10}$/.test(data.Phone)) {
+    if (data.Phone && !/^\d{10}$/.test(data.Phone)){
       setError('Phone', 'Must be exactly 10 digits');
+    }
+    if (data.Phone == data.Mobile){
+      setError('Phone', 'Must be different from Mobile');
+    }
+
+    //Nominee mobile Validation
+    if (data.Nominee_Mobile && !/^\d{10}$/.test(data.Nominee_Mobile)) {
+      setError('Nominee_Mobile', 'Must be exactly 10 digits');
+    }
+    if (data.Nominee_Mobile == data.Mobile){
+      setError('Nominee_Mobile', 'Must be different from Mobile');
+    }
+
+    if (data.Nominee_Mobile == data.Phone){
+      setError('Nominee_Mobile', 'Must be different from Phone');
     }
 
     // Email Validation

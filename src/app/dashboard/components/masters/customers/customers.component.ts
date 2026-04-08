@@ -32,8 +32,10 @@ export class CustomersComponent implements OnInit {
   FieldNames = signal<TypeFieldInfo[]>([
     { Field_Name: 'Party_Code', Data_Type: 'string' },
     { Field_Name: 'Party_Name', Data_Type: 'string' },
-    { Field_Name: 'Phone', Data_Type: 'string' },
+    // { Field_Name: 'Phone', Data_Type: 'string' },
     { Field_Name: 'Mobile', Data_Type: 'string' },
+    { Field_Name: 'Reference', Data_Type: 'string' },
+    { Field_Name: 'Create_Date', Data_Type: 'date' },
     { Field_Name: 'Active_Status', Data_Type: 'boolean' },
     { Field_Name: 'Actions', Data_Type: 'string' },
   ]);
@@ -50,6 +52,9 @@ export class CustomersComponent implements OnInit {
     this.customersService.getCustomers().subscribe({
       next: (res) =>{
         this.customersService.customersList = res;
+        res.forEach((customer: TypeCustomer) => {
+          customer.Create_Date = customer.Create_Date;
+        });
         this.DataSource.set(res);
       },
       error: (err) => {

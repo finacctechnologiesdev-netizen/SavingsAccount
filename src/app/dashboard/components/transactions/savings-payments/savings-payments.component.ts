@@ -145,13 +145,13 @@ export class SavingsPaymentsComponent implements OnInit {
   editPayment(payment: TypeSavingsPayment) {
     const originalReceipt = this.paymentsService.paymentsList.find(r => r.PaymentSno === payment.PaymentSno);
     
-    this.router.navigate(['dashboard/transactions/savings-payments/savings-payment'], {
+    this.router.navigate(['/dashboard/transactions/savings-payments/savings-payment'], {
       state: { data: originalReceipt || payment },
     });
   }
 
   createNew() {
-    this.router.navigate(['dashboard/transactions/savings-payments/savings-payment']);
+    this.router.navigate(['/dashboard/transactions/savings-payments/savings-payment']);
   }
 
   deletePayment(payment: TypeSavingsPayment) {

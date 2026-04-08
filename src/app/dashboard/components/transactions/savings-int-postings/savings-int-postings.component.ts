@@ -137,13 +137,13 @@ export class SavingsIntPostingsComponent implements OnInit {
   editIntPosting(intPosting: TypeSavingsIntPosting) {
     const originalReceipt = this.intPostingsService.intPostingsList.find(r => r.PostingSno === intPosting.PostingSno);
     
-    this.router.navigate(['dashboard/transactions/savings-int-postings/savings-int-posting'], {
+    this.router.navigate(['/dashboard/transactions/savings-int-postings/savings-int-posting'], {
       state: { data: originalReceipt || intPosting },
     });
   }
 
   createNew() {
-    this.router.navigate(['dashboard/transactions/savings-int-postings/savings-int-posting']);
+    this.router.navigate(['/dashboard/transactions/savings-int-postings/savings-int-posting']);
   }
 
   deleteIntPosting(intPosting: TypeSavingsIntPosting) {

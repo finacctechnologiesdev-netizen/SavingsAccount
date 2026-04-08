@@ -170,6 +170,14 @@
           >
             Bank Details
           </button>
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeTab === 5"
+            (click)="activeTab = 5"
+          >
+            Nominee Details
+          </button>
         </div>
 
         <!-- TAB CONTENTS -->
@@ -357,7 +365,7 @@
                 />
                 <label for="Occupation">Occupation</label>
               </div>
-              <div class="input-container w-50">
+              <!-- <div class="input-container w-50">
                 <input
                   type="text"
                   id="Nominee"
@@ -366,60 +374,9 @@
                   placeholder=" "
                 />
                 <label for="Nominee">Nominee</label>
-              </div>
+              </div> -->
             </div>
-            <div class="row-flex">
-              <div class="input-container w-50">
-                <input
-                  type="text"
-                  id="Nominee_Rel"
-                  name="Nominee_Rel"
-                  [(ngModel)]="Customer.Nominee_Rel"
-                  placeholder=" "
-                />
-                <label for="Nominee_Rel">Nominee Relation</label>
-              </div>
-              <div class="input-container w-50">
-                <input
-                  type="text"
-                  id="Nominee_Aadhar"
-                  name="Nominee_Aadhar"
-                  [(ngModel)]="Customer.Nominee_Aadhar"
-                  placeholder=" "
-                  maxlength="12"
-                  (keypress)="globals.isNumberKey($event)"
-                  (input)="
-                    Customer.Nominee_Aadhar = globals.filterNumbers($event)
-                  "
-                />
-                <label for="Nominee_Aadhar">Nominee Aadhar</label>
-                @if (submitCount > 0 && errors["Nominee_Aadhar"]) {
-                  <span class="error-msg">{{ errors["Nominee_Aadhar"] }}</span>
-                }
-              </div>
-            </div>
-            <div class="row-flex">
-              <div class="input-container w-50">
-                <input
-                  type="text"
-                  id="Nominee_Mobile"
-                  name="Nominee_Mobile"
-                  [(ngModel)]="Customer.Nominee_Mobile"
-                  placeholder=" "
-                  maxlength="10"
-                  (keypress)="globals.isNumberKey($event)"
-                  (input)="
-                    Customer.Nominee_Mobile = globals.filterNumbers($event)
-                  "
-                  (blur)="submitCount > 0 ? validateFields() : null"
-                  [class.error]="submitCount > 0 && errors['Nominee_Mobile']"
-                />
-                <label for="Nominee_Mobile">Nominee Mobile</label>
-                @if (submitCount > 0 && errors["Nominee_Mobile"]) {
-                  <span class="error-msg">{{ errors["Nominee_Mobile"] }}</span>
-                }
-              </div>
-            </div>
+            
           }
 
           <!-- Other Info Tab 3 -->
@@ -621,6 +578,75 @@
               </div>
             </div>
           }
+
+          <!-- Nominee Tab 5 -->
+          @if (activeTab === 5) {
+          <div class="row-flex">
+
+              <div class="input-container w-50">
+                <input
+                  type="text"
+                  id="Nominee"
+                  name="Nominee"
+                  [(ngModel)]="Customer.Nominee"
+                  placeholder=" "
+                /> 
+                <label for="Nominee">Nominee</label>
+              </div>
+
+                            <div class="input-container w-50">
+                <input
+                  type="text"
+                  id="Nominee_Mobile"
+                  name="Nominee_Mobile"
+                  [(ngModel)]="Customer.Nominee_Mobile"
+                  placeholder=" "
+                  maxlength="10"
+                  (keypress)="globals.isNumberKey($event)"
+                  (input)="
+                    Customer.Nominee_Mobile = globals.filterNumbers($event)
+                  "
+                  (blur)="submitCount > 0 ? validateFields() : null"
+                  [class.error]="submitCount > 0 && errors['Nominee_Mobile']"
+                />
+                <label for="Nominee_Mobile">Nominee Mobile</label>
+                @if (submitCount > 0 && errors["Nominee_Mobile"]) {
+                  <span class="error-msg">{{ errors["Nominee_Mobile"] }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="row-flex">
+              <div class="input-container w-50">
+                <input
+                  type="text"
+                  id="Nominee_Rel"
+                  name="Nominee_Rel"
+                  [(ngModel)]="Customer.Nominee_Rel"
+                  placeholder=" "
+                />
+                <label for="Nominee_Rel">Nominee Relation</label>
+              </div>
+              <div class="input-container w-50">
+                <input
+                  type="text"
+                  id="Nominee_Aadhar"
+                  name="Nominee_Aadhar"
+                  [(ngModel)]="Customer.Nominee_Aadhar"
+                  placeholder=" "
+                  maxlength="12"
+                  (keypress)="globals.isNumberKey($event)"
+                  (input)="
+                    Customer.Nominee_Aadhar = globals.filterNumbers($event)
+                  "
+                />
+                <label for="Nominee_Aadhar">Nominee Aadhar</label>
+                @if (submitCount > 0 && errors["Nominee_Aadhar"]) {
+                  <span class="error-msg">{{ errors["Nominee_Aadhar"] }}</span>
+                }
+              </div>
+            </div>
+          } 
         </div>
       </form>
     </div>

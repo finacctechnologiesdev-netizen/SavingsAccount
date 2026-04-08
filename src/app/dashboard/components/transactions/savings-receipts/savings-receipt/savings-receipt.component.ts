@@ -205,9 +205,9 @@ export class SavingsReceiptComponent implements OnInit {
               if (!Array.isArray(list)) list = [];
               
               this.seriesList = list;
-              if (!this.isEditMode && this.seriesList.length > 0 && !this.Receipt.SeriesSno) {
-                  this.Receipt.SeriesSno = this.seriesList[0].SeriesSno;
-              }
+              // if (!this.isEditMode && this.seriesList.length > 0 && !this.Receipt.SeriesSno) {
+              //     this.Receipt.SeriesSno = this.seriesList[0].SeriesSno;
+              // }
               this.onSeriesChange();
               this.cdr.detectChanges();
           },
@@ -234,7 +234,7 @@ export class SavingsReceiptComponent implements OnInit {
     } else if (Number(selectedSeries.Num_Method) === 2) {
       this.Receipt.Receipt_No = 'Auto';
     } else {
-      const compSno = Number(sessionStorage.getItem('CompSno')) || 1;
+      const compSno = Number(sessionStorage.getItem('CompSno'));
       this.transNumService.getTransactionNumber(Number(this.Receipt.SeriesSno), compSno).subscribe({
         next: (res: any) => {
           if (res && res.queryStatus === 1 && res.apiData) {
@@ -329,7 +329,7 @@ export class SavingsReceiptComponent implements OnInit {
         payload.ReceiptSno = 0;
         payload.CurrentRowVer = null;
         payload.UserSno = 1;
-        payload.CompSno = 1;
+        payload.CompSno = Number(sessionStorage.getItem('CompSno'));
         payload.CreateDate = ''; 
     }
 

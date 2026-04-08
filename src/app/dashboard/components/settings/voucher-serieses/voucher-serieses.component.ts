@@ -40,11 +40,7 @@ export class VoucherSeriesesComponent implements OnInit {
   selectedSeries: TypeVoucherSeries | null = null;
 
   ngOnInit(): void {
-    if (this.voucherService.seriesList.length === 0) {
       this.loadVoucherSeries();
-    } else {
-      this.DataSource.set(this.voucherService.seriesList);
-    }
   }
 
   loadVoucherSeries() {

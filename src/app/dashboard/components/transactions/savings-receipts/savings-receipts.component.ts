@@ -146,13 +146,13 @@ export class SavingsReceiptsComponent implements OnInit {
   editReceipt(receipt: TypeSavingsReceipt) {
     const originalReceipt = this.receiptsService.receiptsList.find(r => r.ReceiptSno === receipt.ReceiptSno);
     
-    this.router.navigate(['dashboard/transactions/savings-receipts/savings-receipt'], {
+    this.router.navigate(['/dashboard/transactions/savings-receipts/savings-receipt'], {
       state: { data: originalReceipt || receipt },
     });
   }
 
   createNew() {
-    this.router.navigate(['dashboard/transactions/savings-receipts/savings-receipt']);
+    this.router.navigate(['/dashboard/transactions/savings-receipts/savings-receipt']);
   }
 
   deleteReceipt(receipt: TypeSavingsReceipt) {

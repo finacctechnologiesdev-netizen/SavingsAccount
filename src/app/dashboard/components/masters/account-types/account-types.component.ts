@@ -35,6 +35,7 @@ export class AccountTypesComponent implements OnInit {
     { Field_Name: 'Min_Balance', Data_Type: 'string', Display_Name: 'Min Balance' },
     { Field_Name: 'Roi', Data_Type: 'string', Display_Name: 'ROI' },
     { Field_Name: 'Ac_Category', Data_Type: 'string', Display_Name: 'Category' },
+    { Field_Name: 'CreateDate', Data_Type: 'date', Display_Name: 'Create Date' },
     { Field_Name: 'IsActive', Data_Type: 'boolean', Display_Name: 'Status' },
     { Field_Name: 'Actions', Data_Type: 'string', Display_Name: 'Actions' },
   ]);
@@ -51,6 +52,9 @@ export class AccountTypesComponent implements OnInit {
     this.acTypesService.getAcTypes().subscribe({
       next: (res) =>{
         this.acTypesService.acTypesList = res;
+        res.forEach((acType: TypeAcType) =>{
+          acType.CreateDate = acType.CreateDate.date;
+        })
         this.updateDataSource(res);
       },
       error: (err) => {

@@ -55,6 +55,8 @@ export class VoucherSeriesComponent implements OnInit {
     if (!this.Series.MapGroup) {
         this.Series.MapGroup = { GrpSno: (this.Series as any).MapGrpSno || 0 };
     }
+
+    
   }
 
   validateFields(): boolean {

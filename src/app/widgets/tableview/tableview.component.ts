@@ -83,7 +83,26 @@ export class TableviewComponent {
     private pdfService: PdfExportService
   ) {
     effect(() => {
-      this.DataList = this.DataSource();
+      let data = [...this.DataSource()].reverse();
+      
+      const dateField = this.FieldNames().find(f => f.Data_Type === 'date')?.Field_Name || 'CreateDate' || 'Create_Date';
+
+      data.sort((a, b) => {
+        const getVal = (row: any) => {
+          if (!row) return 0;
+          let val = row[dateField];
+          if (!val && row.CreateDate) val = row.CreateDate;
+          if (!val) return 0;
+          if (typeof val === 'number') return val;
+          if (typeof val === 'object' && val.date) return new Date(val.date).getTime();
+          const parsed = new Date(val).getTime();
+          return isNaN(parsed) ? 0 : parsed;
+        };
+
+        return getVal(b) - getVal(a);
+      });
+
+      this.DataList = data;
       this.ApplyAllFilters();
     })
   }
@@ -100,6 +119,8 @@ export class TableviewComponent {
           let rowDateNum: number;
           if (typeof rowVal === 'number') {
             rowDateNum = rowVal;
+          } else if (typeof rowVal === 'object' && rowVal.date) {
+            rowDateNum = this.globals.DateToInt(new Date(rowVal.date));
           } else {
             // Assume string like YYYY-MM-DD or Date object
             const d = new Date(rowVal);

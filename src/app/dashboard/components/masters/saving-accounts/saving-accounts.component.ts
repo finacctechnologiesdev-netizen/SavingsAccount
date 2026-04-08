@@ -39,23 +39,11 @@ export class SavingAccountsComponent implements OnInit {
   printData: any[] = [];
   DataSource = signal<any[]>([]);
   FieldNames = signal<TypeFieldInfo[]>([
-    {
-      Field_Name: 'SbAccount_No',
-      Data_Type: 'string',
-      Display_Name: 'Account No',
-    },
-    {
-      Field_Name: 'Passbook_No',
-      Data_Type: 'string',
-      Display_Name: 'Passbook No',
-    },
-    {
-      Field_Name: 'Party_Name',
-      Data_Type: 'string',
-      Display_Name: 'Customer Name',
-    },
+    { Field_Name: 'SbAccount_No', Data_Type: 'string', Display_Name: 'Account No' },
+    { Field_Name: 'Passbook_No', Data_Type: 'string', Display_Name: 'Passbook No' },
+    { Field_Name: 'Party_Name', Data_Type: 'string', Display_Name: 'Customer Name' },
     { Field_Name: 'Reference', Data_Type: 'string' },
-    { Field_Name: 'Remarks', Data_Type: 'string' },
+    { Field_Name: 'CreateDate', Data_Type: 'date' },
     { Field_Name: 'Actions', Data_Type: 'string' },
   ]);
 
@@ -86,6 +74,13 @@ export class SavingAccountsComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         let accList = res.accounts;
+        accList.forEach((account: TypeSavingAccount) => {
+          if (account.CreateDate && account.CreateDate.date) {
+            account.CreateDate = account.CreateDate.date;
+          }
+        });
+       // console.log("accList", accList);
+
         // if (res.accounts && res.accounts.apiData) {
         //   accList =
         //     typeof res.accounts.apiData === 'string'
