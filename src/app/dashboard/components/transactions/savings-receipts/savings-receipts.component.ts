@@ -36,7 +36,8 @@ export class SavingsReceiptsComponent implements OnInit {
   }
 
   //Date filtering vars
-  fromDate:string = new Date().toISOString().split('T')[0];
+  //fromDate:string = new Date().toISOString().split('T')[0];
+  fromDate:string = "2025-04-01";
   toDate: string = new Date().toISOString().split('T')[0];
 
   DataSource = signal<any[]>([]);

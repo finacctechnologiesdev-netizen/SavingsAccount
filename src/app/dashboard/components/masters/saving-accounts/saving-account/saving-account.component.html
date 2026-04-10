@@ -30,6 +30,7 @@
           </div>
 
 
+
         </div>
 
         <div class="row-flex">
@@ -103,6 +104,17 @@
             </label>
             <span class="status-text">{{ Account.IsActive === 1 ? "Active" : "Inactive" }}</span>
           </div>
+
+          @if (isEditMode) {
+          <div class="print-actions-row">
+            <button type="button" class="btn-print-drawer" (click)="printAccount()">
+              <i class="bx bx-printer"></i> Print Front Page
+            </button>
+            <button type="button" class="btn-print-stmt-drawer" (click)="openStatementDialog()">
+              <i class="bx bx-book-open"></i> Print Account Statement
+            </button>
+          </div>
+          }
         </div>
 
 
@@ -110,9 +122,72 @@
     </div>
 
     <footer class="drawer-footer">
+      <!-- @if (isEditMode) {
+      <button type="button" class="btn-print-drawer" (click)="printAccount()">
+        <i class="bx bx-printer"></i> Print
+      </button>
+      } -->
       <button type="button" class="btn-save-drawer" (click)="saveAccount()">
         <i class="bx bx-save"></i> {{ isEditMode ? "Update" : "Save" }}
       </button>
     </footer>
   </div>
 </div>
+
+<!-- ── Statement Date Range Dialog ───────────────────────────────────────── -->
+@if (showStatementDialog) {
+<div class="stmt-dialog-backdrop" (click)="closeStatementDialog()">
+  <div class="stmt-dialog" (click)="$event.stopPropagation()">
+
+    <div class="stmt-dialog-header">
+      <div class="stmt-dialog-title">
+        <i class="bx bx-book-open"></i>
+        Print Account Statement
+      </div>
+      <button class="stmt-close-btn" (click)="closeStatementDialog()">
+        <i class="bx bx-x"></i>
+      </button>
+    </div>
+
+    <div class="stmt-dialog-body">
+      <p class="stmt-account-info">
+        <span><b>Account:</b> {{ Account.SbAccount_No }}</span>
+        <span><b>Passbook No:</b> {{ Account.Passbook_No }}</span>
+      </p>
+
+      <div class="stmt-form-row">
+        <div class="stmt-input-group">
+          <label for="stmtFromDate">From Date</label>
+          <input type="date" id="stmtFromDate" [(ngModel)]="stmtFromDate" />
+        </div>
+        <div class="stmt-input-group">
+          <label for="stmtToDate">To Date</label>
+          <input type="date" id="stmtToDate" [(ngModel)]="stmtToDate" />
+        </div>
+      </div>
+
+      <div class="stmt-passbook-info">
+        <i class="bx bx-info-circle"></i>
+        <span>
+          The statement will be formatted to fit the physical passbook layout (2 sections per sheet, 12 lines each).
+          Printing resumes from the last saved position in the passbook.
+        </span>
+      </div>
+    </div>
+
+    <div class="stmt-dialog-footer">
+      <button class="stmt-btn-secondary" (click)="closeStatementDialog()" [disabled]="stmtLoading">
+        Cancel
+      </button>
+      <button class="stmt-btn-primary" (click)="printStatement()" [disabled]="stmtLoading">
+        @if (stmtLoading) {
+          <i class="bx bx-loader-alt bx-spin"></i> Loading...
+        } @else {
+          <i class="bx bx-printer"></i> Print Statement
+        }
+      </button>
+    </div>
+
+  </div>
+</div>
+}

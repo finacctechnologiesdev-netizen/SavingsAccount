@@ -69,6 +69,25 @@
                 <span class="error-msg">{{ errors["Receipt_No"] }}</span>
               }
             </div>
+
+            
+          <!-- @if(isEditMode){
+          <div class="input-container w-50">
+            <input type="text" id="SeriesSno" name="SeriesSno" [(ngModel)]="Receipt.SeriesSno"
+              />
+            <label for="SeriesSno">Series Sno <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["SeriesSno"]) {
+            <span class="error-msg">{{ errors["SeriesSno"] }}</span>
+            }
+
+            <input type="text" id="ReceiptSno" name="ReceiptSno" [(ngModel)]="Receipt.ReceiptSno"
+              />
+            <label for="ReceiptSno">Receipt Sno <span class="req">*</span></label>
+            @if (submitCount > 0 && errors["ReceiptSno"]) {
+            <span class="error-msg">{{ errors["ReceiptSno"] }}</span>
+            }
+          </div>
+          } -->
           </div>
 
           <!-- Row 2: Receipt Date & Account Selection -->

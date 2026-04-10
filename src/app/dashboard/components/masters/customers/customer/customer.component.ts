@@ -80,11 +80,11 @@ export class CustomerComponent implements OnInit {
     if (data.Nominee_Mobile && !/^\d{10}$/.test(data.Nominee_Mobile)) {
       setError('Nominee_Mobile', 'Must be exactly 10 digits');
     }
-    if (data.Nominee_Mobile == data.Mobile){
+    if (data.Nominee_Mobile && data.Nominee_Mobile == data.Mobile){
       setError('Nominee_Mobile', 'Must be different from Mobile');
     }
 
-    if (data.Nominee_Mobile == data.Phone){
+    if (data.Nominee_Mobile && data.Nominee_Mobile == data.Phone){
       setError('Nominee_Mobile', 'Must be different from Phone');
     }
 

@@ -54,7 +54,7 @@ export const routes: Routes = [
             {
                 path: 'masters',
                 loadChildren: () =>
-                    import('./dashboard/components/masters/masters.routes')   // ✅ loads masters routes lazily
+                    import('./dashboard/components/masters/masters.routes') 
                         .then(m => m.MASTER_ROUTES)
             },
 
@@ -97,7 +97,7 @@ export const routes: Routes = [
             {
                 path: 'transactions',
                 loadChildren: () =>
-                    import('./dashboard/components/transactions/transactions.routes')   // ✅ loads transactions routes lazily
+                    import('./dashboard/components/transactions/transactions.routes') 
                         .then(m => m.TRANSACTIONS_ROUTES)
             },
             // // Receipts Routes
