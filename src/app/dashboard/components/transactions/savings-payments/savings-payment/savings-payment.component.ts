@@ -118,7 +118,8 @@ export class SavingsPaymentComponent implements OnInit {
       this.isEditMode = true;
       this.payment = { ...stateData };
    
-      this.payment.Payment_Date = this.globals.formatDate(this.payment.Payment_Date, 'yyyy-MM-dd');
+      //this.payment.Payment_Date = this.globals.formatDate(this.payment.Payment_Date, 'yyyy-MM-dd');
+      this.payment.Payment_Date = this.globals.extractDateString(this.payment.Payment_Date);
       this.payment.CreateDate = this.globals.formatDate(this.payment.CreateDate, 'yyyy-MM-dd');
       
       this.onAccountSelected(); 
@@ -126,7 +127,8 @@ export class SavingsPaymentComponent implements OnInit {
       this.isEditMode = false;
       this.payment = this.paymentsService.initializePayment();
       const today = new Date();
-      this.payment.Payment_Date = this.globals.formatDate(today, 'yyyy-MM-dd');
+      // this.payment.Payment_Date = this.globals.formatDate(today, 'yyyy-MM-dd');
+      this.payment.Payment_Date = this.globals.formatDate(new Date(), 'yyyy-MM-dd');
     }
   }
 
@@ -321,7 +323,9 @@ export class SavingsPaymentComponent implements OnInit {
     const payload: any = { ...this.payment };
     payload.IsActive = (payload.IsActive === true || payload.IsActive === 1) ? 1 : 0;
 
-    payload.Payment_Date = this.globals.formatDateForApi(payload.Payment_Date);
+    //payload.Payment_Date = this.globals.formatDateForApi(payload.Payment_Date);
+    payload.Payment_Date = this.globals.buildIstDateTime(payload.Payment_Date);
+    console.log('Payment date payload:', payload.Payment_Date);
 
     payload.SbAcSno = Number(payload.SbAcSno);
     payload.Amount = Number(payload.Amount);

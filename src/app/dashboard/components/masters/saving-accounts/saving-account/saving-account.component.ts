@@ -41,10 +41,18 @@ export class SavingAccountComponent implements OnInit {
   acTypesService: any;
 
   // ── Statement dialog state ──────────────────────────────────────────────
-  showStatementDialog = false;
+  showStatementDialog  = false;
   stmtFromDate: string = '';
-  stmtToDate: string = '';
-  stmtLoading = false;
+  stmtToDate: string   = '';
+  stmtLoading          = false;
+  /** true when Last_Print_Date is set — user cannot change the from date */
+  stmtFromDateReadOnly = false;
+  /** AcStatement rows loaded when the dialog opens (chronological order: oldest first) */
+  stmtCachedStatements: any[] = [];
+  /** true after print preview is opened — shows confirm/skip buttons */
+  stmtPrintDone        = false;
+  /** The formatted datetime string to persist when user confirms print status */
+  stmtPendingPrintDate = '';
 
   constructor(
     private router: Router,
@@ -369,7 +377,7 @@ export class SavingAccountComponent implements OnInit {
           }
 
           const accountId = this.isEditMode ? this.Account.SbAcSno : res.RetSno;
-
+          const DateNow = this.globals.formatDate(new Date(), 'yyyy-MM-dd');
           //Adding minimum balance
           if (!this.isEditMode) {
             const selectedAcType = this.accountTypesList.find(
@@ -384,9 +392,7 @@ export class SavingAccountComponent implements OnInit {
                 SeriesSno: SeriesSno,
                 ReceiptSno: 0,
                 Receipt_No: 'Auto',
-                Receipt_Date: this.globals.formatDateForApi(
-                  this.globals.formatDate(new Date(), 'yyyy-MM-dd'),
-                ),
+                Receipt_Date: this.globals.buildIstDateTime(DateNow),
                 SbAcSno: accountId,
                 Amount: minBalance,
                 Payment_Mode: 4,
@@ -664,30 +670,114 @@ export class SavingAccountComponent implements OnInit {
     this.printService.printContent(printContent);
   }
 
+  /** Safely returns the last print date as 'yyyy-MM-dd' for display.
+   *  Handles both PHP date object { date: "..." } and plain string. */
+  get lastPrintDateDisplay(): string {
+    return this.globals.extractDateString(this.Account?.Last_Print_Date);
+  }
+
   // ── Statement Dialog ──────────────────────────────────────────────────────
   openStatementDialog() {
-    // Default: show from account creation date to today
-    const today = new Date();
-    this.stmtToDate = this.globals.formatDate(today, 'yyyy-MM-dd');
-    let rawCreate = this.Account.CreateDate;
-    if (rawCreate && rawCreate.date) rawCreate = rawCreate.date;
-    this.stmtFromDate = rawCreate
-      ? this.globals.formatDate(rawCreate, 'yyyy-MM-dd')
-      : this.stmtToDate;
+    this.stmtLoading = true;
+    this.stmtCachedStatements = [];
+
+    // ── From Date: same day as Last_Print_Date (time-based filter handles exclusion) ──
+    const lastPrint = this.Account.Last_Print_Date;
+    if (lastPrint) {
+      // Show the date of last print; rows filter uses EXACT time so same-day
+      // transactions after the print time will correctly appear in the next job.
+      this.stmtFromDate     = this.globals.extractDateString(lastPrint);
+      this.stmtFromDateReadOnly = true;
+    } else {
+      // No previous print — user enters from date manually
+      this.stmtFromDate     = '';
+      this.stmtFromDateReadOnly = false;
+    }
+
+    // ── To Date: default to today, will be overridden by last entry date ──
+    this.stmtToDate = this.globals.formatDate(new Date(), 'yyyy-MM-dd');
     this.showStatementDialog = true;
+
+    // ── Load AcStatement to find last entry date for toDate ──
+    this.summaryService.getAccountSummary(this.Account.SbAcSno!).subscribe({
+      next: (res: any) => {
+        const list = Array.isArray(res) ? res : [];
+        if (list.length) {
+          const item = list[0];
+          try {
+            if (item.AcStatement && typeof item.AcStatement === 'string')
+              item.AcStatement = JSON.parse(item.AcStatement);
+          } catch (e) { console.error('AcStatement parse error', e); }
+
+          const raw: any[] = Array.isArray(item.AcStatement) ? item.AcStatement : [];
+          // Reverse to chronological order (oldest → newest)
+          this.stmtCachedStatements = [...raw].reverse();
+
+          // Set toDate = last entry date in the statement
+          if (this.stmtCachedStatements.length > 0) {
+            const lastItem = this.stmtCachedStatements[this.stmtCachedStatements.length - 1];
+            const lastDateStr = (lastItem.TransDate || '').toString().substring(0, 10);
+            if (lastDateStr) this.stmtToDate = lastDateStr;
+          }
+        }
+        this.stmtLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load statement data for dialog', err);
+        this.stmtLoading = false;
+      },
+    });
   }
 
   closeStatementDialog() {
-    this.showStatementDialog = false;
-    this.stmtLoading = false;
+    this.showStatementDialog  = false;
+    this.stmtLoading          = false;
+    this.stmtPrintDone        = false;
+    this.stmtPendingPrintDate = '';
+  }
+
+  /** User confirmed the print succeeded — persist Last_Print_Date to DB. */
+  confirmPrintStatus() {
+    // Build datetime at the EXACT moment user clicks 'Update Print Status',
+    // using stmtToDate as the date part and current IST clock for the time.
+    // e.g. clicked at 14:20:16 IST on Apr 11 → '2026-04-11 14:20:16'
+    const dateToSave = this.globals.buildIstDateTime(this.stmtToDate);
+    this.stmtLoading = true;
+
+    const payload: any = {
+      ...this.Account,
+      Last_Print_Date: dateToSave,
+      IsActive:      Number(this.Account.IsActive) === 1 ? 1 : 0,
+      PartySno:      Number(this.Account.PartySno),
+      JointPartySno: Number(this.Account.JointPartySno) || 0,
+      RefPartySno:   Number(this.Account.RefPartySno)   || 0,
+      AcTypeSno:     Number(this.Account.AcTypeSno)     || 1,
+    };
+
+    this.accountsService.crudSavingsAcc(1, payload).subscribe({
+      next: (res: any) => {
+        if (res?.CurrentRowVer) this.Account.CurrentRowVer = res.CurrentRowVer;
+        this.Account.Last_Print_Date = dateToSave;
+        this.globals.SnackBar('success', 'Print status updated successfully');
+        this.closeStatementDialog();
+      },
+      error: (e) => {
+        console.error('Failed to update Last_Print_Date:', e);
+        this.globals.SnackBar('error', 'Failed to update print status');
+        this.stmtLoading = false;
+      },
+    });
+  }
+
+  /** User chose not to update — just close the dialog without any DB change. */
+  skipPrintStatus() {
+    this.closeStatementDialog();
   }
 
   // ── Print Account Statement with Passbook Pagination ──────────────────────
-  // Layout: each physical sheet has 2 sections (top & bottom), each fits
-  // LINES_PER_SECTION rows. We track the last printed position per account in
-  // sessionStorage so the next session resumes exactly where the passbook was left.
+  // Position is computed from Last_Print_Date + total transaction count —
+  // no sessionStorage needed. The physical passbook position is deterministic.
   printStatement() {
-    // ── Local layout constants (mirror file-level constants for clarity) ──
     const LINES_PER_SECTION  = 14;
     const LINES_PER_SHEET    = 28;
     const SECTIONS_PER_SHEET = 2;
@@ -700,9 +790,14 @@ export class SavingAccountComponent implements OnInit {
       this.globals.SnackBar('error', 'From date cannot be after To date');
       return;
     }
+    if (this.stmtCachedStatements.length === 0) {
+      this.globals.SnackBar('error', 'Statement data not loaded yet, please wait');
+      return;
+    }
 
     this.stmtLoading = true;
 
+    // ── Reload fresh data to guarantee accuracy ──
     this.summaryService.getAccountSummary(this.Account.SbAcSno!).subscribe({
       next: (res: any) => {
         const list = Array.isArray(res) ? res : [];
@@ -713,14 +808,10 @@ export class SavingAccountComponent implements OnInit {
         }
 
         const item = list[0];
-        // Parse JSON strings from API
         try {
-          if (item.Party && typeof item.Party === 'string')
-            item.Party = JSON.parse(item.Party);
-          if (item.AcType && typeof item.AcType === 'string')
-            item.AcType = JSON.parse(item.AcType);
-          if (item.AcStatement && typeof item.AcStatement === 'string')
-            item.AcStatement = JSON.parse(item.AcStatement);
+          if (item.Party      && typeof item.Party      === 'string') item.Party      = JSON.parse(item.Party);
+          if (item.AcType     && typeof item.AcType     === 'string') item.AcType     = JSON.parse(item.AcType);
+          if (item.AcStatement && typeof item.AcStatement === 'string') item.AcStatement = JSON.parse(item.AcStatement);
         } catch (e) {
           console.error('Failed to parse API response fields:', e);
           this.globals.SnackBar('error', 'Invalid data received from server');
@@ -729,47 +820,59 @@ export class SavingAccountComponent implements OnInit {
         }
 
         const customer = item.Party;
-        const acType = item.AcType;
-        let allStatements: any[] = Array.isArray(item.AcStatement)
-          ? item.AcStatement
+        const acType   = item.AcType;
+        // Chronological order: oldest → newest (reverse API's descending order)
+        const allStatements: any[] = Array.isArray(item.AcStatement)
+          ? [...item.AcStatement].reverse()
           : [];
+        // ── Helper: parse the API's datetime format reliably ─────────────────
+        // API returns: "2026-04-11 14:02:21.000000" (space + 6-digit microseconds)
+        // new Date("YYYY-MM-DD HH:...") → Invalid Date in Firefox / inconsistent Chrome
+        // Fix: normalise to "YYYY-MM-DDTHH:MM:SS" which browsers parse as LOCAL time (IST)
+        const parseApiDate = (transDate: any): number => {
+          // Handle PHP date object: { date: "YYYY-MM-DD HH:MM:SS.ffffff", timezone: "UTC" }
+          const raw = (transDate?.date || transDate || '').toString().trim();
+          if (!raw) return 0;
+          // "2026-04-11 14:02:21.000000" → "2026-04-11T14:02:21" → parsed as local IST
+          const iso = raw.replace(' ', 'T').replace(/\.\d+$/, '');
+          const d = new Date(iso);
+          return isNaN(d.getTime()) ? 0 : d.getTime();
+        };
 
-        // Sort chronologically oldest → newest; secondary key = TransNo for stable same-day ordering
-        // allStatements.sort((a: any, b: any) => {
-        //   const dateDiff =
-        //     new Date(a.TransDate).getTime() - new Date(b.TransDate).getTime();
-        //   if (dateDiff !== 0) return dateDiff;
-        //   return (a.TransNo || '').localeCompare(b.TransNo || '');
-        // });
-       
+        // ── 1. Position tracking via Last_Print_Date (EXACT time) ─────────
+        // printedCount = all transactions with TransDate ≤ Last_Print_Date time.
+        // Using exact ms — not end-of-day — so mid-day reprints work correctly.
+        const lastPrint        = this.Account.Last_Print_Date;
+        const lpRaw            = lastPrint
+          ? (lastPrint.date || lastPrint).toString().replace(' ', 'T').replace(/\.\d+$/, '')
+          : '';
+        const lastPrintExactMs = lpRaw ? new Date(lpRaw).getTime() : 0;
 
-        // Filter by date range selected in dialog
-        const fromMs = new Date(this.stmtFromDate).setHours(0, 0, 0, 0);
-        const toMs = new Date(this.stmtToDate).setHours(23, 59, 59, 999);
+        const printedCount = allStatements.filter((s: any) =>
+          parseApiDate(s.TransDate) <= lastPrintExactMs
+        ).length;
 
-        // Compute running balance for ALL transactions first (to get opening balance)
-        let runningBalance = 0;
-        const enriched: any[] = allStatements.map((s: any) => {
-          const amt = Number(s.Amount) || 0;
-          if (s.Type === 'Receipt') {
-            runningBalance += amt;
-          } else {
-            runningBalance -= amt;
-          }
-          return { ...s, balance: runningBalance };
-        });
+        // Where in the passbook are we?
+        //to calculate the current line on the sheet
+        const currentLineOnSheet    = printedCount % LINES_PER_SHEET;
+        //how many lines we need to skip in current page
+        const lineInCurrentSection  = currentLineOnSheet % LINES_PER_SECTION;
+        //to check whether we in top or bottom page
+        const isOnBottomSection     = currentLineOnSheet >= LINES_PER_SECTION;
+        // Column header was physically printed on the FIRST section of the FIRST print job.
+        // Never print it again on subsequent print jobs.
+        const headerAlreadyPrinted  = printedCount > 0;
 
-        // Opening balance = balance just before fromDate
-        let openingBalance = 0;
-        for (const s of enriched) {
-          const d = new Date(s.TransDate).getTime();
-          if (d < fromMs) openingBalance = s.balance;
-          else break;
-        }
+        // ── 2. Filter rows for this print job (EXACT time boundary) ──────────
+        // fromMs = 1ms AFTER Last_Print_Date time  → strictly excludes already-printed rows
+        // If no last print → from midnight of the user-selected from date
+        const fromMs = lastPrint
+          ? lastPrintExactMs + 1
+          : new Date(this.stmtFromDate).setHours(0, 0, 0, 0);
+        const toMs   = new Date(this.stmtToDate).setHours(23, 59, 59, 999);
 
-        // Filtered rows for the selected date range
-        const rows = enriched.filter((s: any) => {
-          const d = new Date(s.TransDate).getTime();
+        const rows = allStatements.filter((s: any) => {
+          const d = parseApiDate(s.TransDate);
           return d >= fromMs && d <= toMs;
         });
 
@@ -779,66 +882,23 @@ export class SavingAccountComponent implements OnInit {
           return;
         }
 
-        // ── Passbook position tracking ──
-        // Key: pb_pos_{SbAcSno} → { page: number, line: number }
-        const posKey = `pb_pos_${this.Account.SbAcSno}`;
-        let savedPos = { page: 1, line: 0 };
-        try {
-          const stored = sessionStorage.getItem(posKey);
-          if (stored) savedPos = JSON.parse(stored);
-        } catch (e) {}
-
-        // page: 1-based physical sheet number
-        // line: 0-based row within that sheet (0..LINES_PER_SHEET-1)
-        let currentPage = savedPos.page;
-        let currentLineOnSheet = savedPos.line;
-
-        // ── Build paginated row data (sections accumulate raw tbody HTML) ──
-        // buildSectionTable() (defined below) wraps each section in the table/header.
+        // ── 3. Build sections ─────────────────────────────────────────────
+        // First section may start at an OFFSET (lineInCurrentSection skip rows)
+        // so the data aligns with the correct physical row in the passbook.
         const sections: string[] = [];
+        let rowIndex  = 0;
+        let startSkip = lineInCurrentSection; // skip rows only for first section
 
-        // Always prepend opening balance as first data row of this print job
-        let pendingRows: any[] = [...rows];
-        pendingRows = [
-         
-          ...pendingRows,
-        ];
-
-        let rowIndex = 0;
-        while (rowIndex < pendingRows.length) {
-          // How many lines remain available in the current section?
-          const lineInCurrentSection = currentLineOnSheet % LINES_PER_SECTION;
-          const linesLeft = LINES_PER_SECTION - lineInCurrentSection;
-
-          let sectionRows = '';
-          let filled = 0;
-
-          while (rowIndex < pendingRows.length && filled < linesLeft) {
-            const s = pendingRows[rowIndex];
-
-            // ── Date ──────────────────────────────────────────────────────
-            const dateStr = s.TransDate
-              ? this.globals.formatDateToDDMMYYYY(s.TransDate)
-              : '';
-
-            // ── Trans No (Particulars col 2) ───────────────────────────────
-            const transNo = s.TransNo || '';
-
-            // ── Particulars (col 3): Type label + optional Remarks in ()  ──
-            // Format: "Receipt"  or  "Receipt (Min Balance)"
-            // Format: "Payment"  or  "Payment (some remark)"
-            const typeLabel = s.Type === 'Receipt' ? 'Receipt'
-              : s.Type === 'Payment' ? 'Payment'
-              : (s.Type || '');
-            const remarks = (s.Remarks || s.Reference || '').trim();
-            const particulars = remarks ? `${typeLabel} (${remarks})` : typeLabel;
-
-            // ── Amounts ────────────────────────────────────────────────────
-            const withdrawals = s.Type === 'Payment' ? Number(s.Amount).toFixed(2) : '';
-            const deposits    = s.Type === 'Receipt' ? Number(s.Amount).toFixed(2) : '';
-            const balance     = Number(s.balance).toFixed(2);
-
-            sectionRows += `<tr>
+        const buildRow = (s: any): string => {
+          const dateStr     = s.TransDate ? this.globals.formatDateToDDMMYYYY(s.TransDate) : '';
+          const transNo     = s.TransNo || '';
+          const typeLabel   = s.Type === 'Receipt' ? 'Receipt' : s.Type === 'Payment' ? 'Payment' : (s.Type || '');
+          const remarks     = (s.Remarks || s.Reference || '').trim();
+          const particulars = remarks ? `${typeLabel} (${remarks})` : typeLabel;
+          const withdrawals = s.Type === 'Payment' ? Number(s.Amount).toFixed(2) : '';
+          const deposits    = s.Type === 'Receipt' ? Number(s.Amount).toFixed(2) : '';
+          const balance     = Number(s.Current_Balance).toFixed(2);
+          return `<tr>
               <td>${dateStr}</td>
               <td>${transNo}</td>
               <td>${particulars}</td>
@@ -846,62 +906,66 @@ export class SavingAccountComponent implements OnInit {
               <td class="r">${deposits}</td>
               <td class="r b">${balance}</td>
             </tr>`;
+        };
 
+          const emptyRow = `
+          <tr class="empty">
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>`;
+          const skipRow  = `
+          <tr class="skip">
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>`;
 
-            rowIndex++;
+        while (rowIndex < rows.length) {
+          const linesAvail = LINES_PER_SECTION - startSkip; // data rows available in this section
+          let sectionRows  = '';
+
+          // Skip rows = blank space representing already-printed rows at start of section
+          for (let f = 0; f < startSkip; f++) sectionRows += skipRow;
+
+          // Fill available data slots
+          let filled = 0;
+          while (rowIndex < rows.length && filled < linesAvail) {
+            sectionRows += buildRow(rows[rowIndex++]);
             filled++;
-            currentLineOnSheet++;
           }
 
-          // Pad remaining lines with empty filler rows to preserve physical spacing
-          for (let e = filled; e < linesLeft; e++) {
-            sectionRows += `<tr class="empty"><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>`;
-          }
+          // Pad remaining slots with empty filler (paper must advance full section height)
+          for (let e = filled; e < linesAvail; e++) sectionRows += emptyRow;
 
-          // Push just the tbody rows – buildSectionTable adds the full table wrapper
           sections.push(sectionRows);
-
-          // Advance to next section or next physical sheet
-          if (currentLineOnSheet >= LINES_PER_SHEET) {
-            currentPage++;
-            currentLineOnSheet = 0;
-          }
-          // If currentLineOnSheet is between LINES_PER_SECTION and LINES_PER_SHEET,
-          // we're on the bottom section of the same sheet – loop naturally continues.
+          startSkip = 0; // only first section has skip rows
         }
 
-
-        // NOTE: sessionStorage position update is deferred to onAfterPrint
-        // (see printService.printContent second argument below) so it only
-        // fires AFTER the user confirms print in the dialog, not on preview.
-
-        // ── Build print HTML exactly sized to the physical passbook sheet ──
-        // Page: Letter Portrait (215.9mm × 279.4mm), margin: 0
-        // Section 1 (top):    starts at 0,   height = 87mm
-        // Gap (perforation):  ~6mm empty space between sections
-        // Section 2 (bottom): starts at 93mm, height = 87mm
-        // Row height: 5.5mm  |  Header row: 6mm
-        // No backgrounds, no colors – dot matrix safe
-
-        const ROW_H = '5.5mm';
+        // ── 4. Build table wrapper ────────────────────────────────────────
+        const ROW_H    = '5.5mm';
         const HEADER_H = '6mm';
         const SECTION_H = '87mm';
-        const acTypeName = acType ? acType.AcType_Name : '';
-        const customerName = customer ? customer.Party_Name : '';
-        const fromDisp = this.globals.formatDateToDDMMYYYY(this.stmtFromDate);
-        const toDisp = this.globals.formatDateToDDMMYYYY(this.stmtToDate);
+        const acTypeName   = acType   ? acType.AcType_Name   : '';
+        const customerName = customer ? customer.Party_Name  : '';
 
-        // showHeader = true  → renders thead (top section of each sheet, header prints once)
-        // showHeader = false → colgroup only, no thead   (bottom section, no duplicate header)
+        // showHeader: column headings appear ONLY on the first section of the
+        // first-ever print job (when the passbook has never been printed before).
         const buildSectionTable = (sectionRows: string, showHeader: boolean) => `
           <table>
             <colgroup>
-              <col style="width:22mm">  <!-- Date -->
-              <col style="width:24mm">  <!-- Trans No -->
-              <col style="width:75mm">  <!-- Particulars -->
-              <col style="width:20mm">  <!-- Withdrawals -->
-              <col style="width:20mm">  <!-- Deposits -->
-              <col style="width:24mm">  <!-- Balance -->
+              <col style="width:20mm"><!-- Date: compact, "10-04-2026" fits in 20mm -->
+              <col style="width:22mm"><!-- Trans No -->
+              <col style="width:75mm"><!-- Particulars -->
+              <col style="width:20mm"><!-- Withdrawals -->
+              <col style="width:20mm"><!-- Deposits -->
+              <col style="width:28mm"><!-- Balance: wider to prevent clip -->
             </colgroup>
             ${showHeader ? `
             <thead>
@@ -917,124 +981,77 @@ export class SavingAccountComponent implements OnInit {
             <tbody>${sectionRows}</tbody>
           </table>`;
 
+        // Empty section HTML (for the top-section skip when resuming in bottom section)
+        const emptySection = buildSectionTable(
+          Array(LINES_PER_SECTION).fill(emptyRow).join(''), false
+        );
 
-        // Pair sections into sheets
+        // ── 5. Pair sections into sheets ──────────────────────────────────
+        // If resuming in the bottom section, the first physical sheet needs:
+        //   top (87mm blank, already printed) + gap + bottom (sections[0])
+        // All subsequent sheets: top=sections[i] + gap + bottom=sections[i+1]
         let sheetsHtml = '';
-        for (let i = 0; i < sections.length; i += SECTIONS_PER_SHEET) {
-          const topRows = sections[i] || '';
-          const botRows = sections[i + 1] || '';
+        let sIdx = 0; // current index into sections[]
+
+        if (isOnBottomSection && sections.length > 0) {
+          // Top area was already printed — output empty top to advance paper
           sheetsHtml += `
             <div class="sheet">
-              <div class="section">
-                ${buildSectionTable(topRows, true)}
-              </div>
+              <div class="section">${emptySection}</div>
               <div class="gap"></div>
-              <div class="section">
-                ${buildSectionTable(botRows, false)}
-              </div>
+              <div class="section">${buildSectionTable(sections[0], false)}</div>
             </div>`;
-
+          sIdx = 1;
         }
 
+        for (; sIdx < sections.length; sIdx += SECTIONS_PER_SHEET) {
+          const topRows = sections[sIdx]     || '';
+          const botRows = sections[sIdx + 1] || '';
+          // Header only on the very first top-section of the very first print job
+          const isFirstTopSection = sIdx === 0 && !isOnBottomSection;
+          const showHeader        = isFirstTopSection && !headerAlreadyPrinted;
+          sheetsHtml += `
+            <div class="sheet">
+              <div class="section">${buildSectionTable(topRows, showHeader)}</div>
+              <div class="gap"></div>
+              <div class="section">${buildSectionTable(botRows, false)}</div>
+            </div>`;
+        }
+
+        // ── 6. Compose full print HTML ─────────────────────────────────────
         const printContent = `<!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <title>Passbook Statement</title>
-            <style>
-              @page {
-                size: letter portrait;
-                margin: 0;
-              }
-
-              * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-              }
-
-              body {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 10px;
-                color: #000;
-                background: #fff;
-                padding-top: 3mm;
-              }
-
-              /* 185mm to leave comfortable margin so Balance col stays within
-                 the physical passbook boundary (passbook ~200mm, printer margins ~7mm each side) */
-              .sheet {
-                width: 185mm;
-                margin: 0 auto;
-                page-break-after: always;
-              }
-              .sheet:last-child { page-break-after: auto; }
-
-              .section {
-                height: ${SECTION_H};
-                overflow: hidden;
-                position: relative;
-              }
-
-              .gap {
-                height: 6mm;
-              }
-
-              table {
-                width: 100%;
-                border-collapse: collapse;
-                table-layout: fixed;
-              }
-
-              thead tr.hdr th {
-                font-size: 9px;
-                font-weight: bold;
-                text-align: left;
-                padding: 1mm 1mm;
-                height: ${HEADER_H};
-                border-top: 0.4pt solid #000;
-                border-bottom: 0.4pt solid #000;
-                white-space: nowrap;
-                overflow: hidden;
-              }
-              thead tr.hdr th.r { text-align: right; }
-
-              tbody tr {
-                height: ${ROW_H};
-              }
-
-              tbody td {
-                font-size: 10px;
-                padding: 0 1mm;
-                vertical-align: middle;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              tbody td.r { text-align: right; }
-              tbody td.b { font-weight: bold; }
-
-              tr.ob td { font-style: italic; }
-            </style>
-          </head>
-          <body>
-            ${sheetsHtml}
-          </body>
-          </html>`;
+          <html lang="en"><head><meta charset="UTF-8"><title>Passbook Statement</title>
+          <style>
+            @page { size: letter portrait; margin: 0; }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: Arial, Helvetica, sans-serif; font-size: 10px; color: #000; background: #fff; padding-top: 5mm; }
+            /* Left-align to physical passbook edge — margin:0 auto shifts ~15mm right, clipping Balance */
+            .sheet { width: 185mm; margin: 0 0 0 3mm; page-break-after: always; }
+            .sheet:last-child { page-break-after: auto; }
+            .section { height: ${SECTION_H}; overflow: hidden; position: relative; }
+            .gap     { height: 6mm; }
+            table    { width: 100%; border-collapse: collapse; table-layout: fixed; }
+            thead tr.hdr th {
+              font-size: 9px; font-weight: bold; text-align: left; padding: 1mm 1mm;
+              height: ${HEADER_H}; border-top: 0.4pt solid #000; border-bottom: 0.4pt solid #000;
+              white-space: nowrap; overflow: hidden;
+            }
+            thead tr.hdr th.r { text-align: right; }
+            tbody tr  { height: ${ROW_H}; }
+            tbody td  { font-size: 10px; padding: 0 1mm; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            tbody td.r { text-align: right; }
+            tbody td.b { font-weight: bold; }
+            /* skip rows are blank rows advancing paper over already-printed area */
+            tr.skip td, tr.empty td { }
+          </style></head>
+          <body>${sheetsHtml}</body></html>`;
 
         this.stmtLoading = false;
-        this.closeStatementDialog();
+        // stmtPendingPrintDate is built at actual click time in confirmPrintStatus()
+        this.stmtPrintDone = true;
+        this.printService.printContent(printContent);
 
-        // Pass the position-save as a deferred callback — fires only after the
-        // user clicks Print (or Save as PDF) in the browser print dialog,
-        // NOT when they merely open the preview.
-        this.printService.printContent(printContent, () => {
-          sessionStorage.setItem(
-            posKey,
-            JSON.stringify({ page: currentPage, line: currentLineOnSheet }),
-          );
-        });
+
       },
       error: (err) => {
         console.error('Failed to load account summary for printing', err);
@@ -1044,3 +1061,4 @@ export class SavingAccountComponent implements OnInit {
     });
   }
 }
+

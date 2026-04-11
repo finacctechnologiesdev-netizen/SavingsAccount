@@ -21,6 +21,10 @@ export interface TypeSavingAccount {
     UserSno: number;
     CompSno: number;
     Party?: TypeCustomer;
+    /** Last passbook print date stored in the DB.
+     *  Comes as a PHP date object { date: "YYYY-MM-DD HH:MM:SS.ffffff", ... } or null.
+     *  Used to calculate physical passbook position on next print. */
+    Last_Print_Date?: any;
 }
 
 @Injectable({
@@ -93,6 +97,21 @@ export class SavingAccountsService {
         const body = new HttpParams()
             .set('data', JSON.stringify(payload));
 
+        return this.api.post(this.crudEndpoint, body);
+    }
+
+    /**
+     * Updates only the Last_Print_Date field of a savings account after a passbook print.
+     * TODO: Implement a dedicated lightweight backend endpoint (e.g. app/updatePassbookPrintDate)
+     *       to avoid sending the full account payload for a single field update.
+     */
+    updateLastPrintDate(sbAcSno: number, lastPrintDate: string): Observable<any> {
+        const body = new HttpParams().set('data', JSON.stringify({
+            SbAcSno: sbAcSno,
+            Last_Print_Date: lastPrintDate,
+            CompSno: sessionStorage.getItem('CompSno'),
+            Action: 1, // action 1 = update passbook print date only
+        }));
         return this.api.post(this.crudEndpoint, body);
     }
 

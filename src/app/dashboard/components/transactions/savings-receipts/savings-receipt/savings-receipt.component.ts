@@ -117,16 +117,17 @@ export class SavingsReceiptComponent implements OnInit {
     if (stateData) {
       this.isEditMode = true;
       this.Receipt = { ...stateData };
-   
-      this.Receipt.Receipt_Date = this.globals.formatDate(this.Receipt.Receipt_Date, 'yyyy-MM-dd');
+
+      // globals.extractDateString() safely extracts 'yyyy-MM-dd' from the API date object
+      // without any new Date() parsing — zero timezone shift risk.
+      this.Receipt.Receipt_Date = this.globals.extractDateString(this.Receipt.Receipt_Date);
+
       this.Receipt.CreateDate = this.globals.formatDate(this.Receipt.CreateDate, 'yyyy-MM-dd');
-      
-      this.onAccountSelected(); 
+      this.onAccountSelected();
     } else {
       this.isEditMode = false;
       this.Receipt = this.receiptsService.initializeReceipt();
-      const today = new Date();
-      this.Receipt.Receipt_Date = this.globals.formatDate(today, 'yyyy-MM-dd');
+      this.Receipt.Receipt_Date = this.globals.formatDate(new Date(), 'yyyy-MM-dd');
     }
   }
 
@@ -316,7 +317,9 @@ export class SavingsReceiptComponent implements OnInit {
     const payload: any = { ...this.Receipt };
     payload.IsActive = (payload.IsActive === true || payload.IsActive === 1) ? 1 : 0;
 
-    payload.Receipt_Date = this.globals.formatDateForApi(payload.Receipt_Date);
+    // datetime2(0): 'YYYY-MM-DD HH:MM:SS' with IST local clock — stored directly, no UTC conversion.
+    payload.Receipt_Date = this.globals.buildIstDateTime(payload.Receipt_Date);
+    // console.log('Receipt date payload:', payload.Receipt_Date);
 
     payload.SbAcSno = Number(payload.SbAcSno);
     payload.Amount = Number(payload.Amount);
@@ -387,4 +390,7 @@ export class SavingsReceiptComponent implements OnInit {
   cancelReceipt() {
     this.router.navigate(['dashboard/transactions/savings-receipts']);
   }
+
+
 }
+

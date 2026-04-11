@@ -349,4 +349,48 @@ export class GlobalService {
     
     return calcDate;
   }
-}
+  /**
+   * Builds a datetime string in the correct format for datetime2(0) SQL Server columns.
+   *
+   * Format: 'YYYY-MM-DD HH:MM:SS'  (space separator, no Z, no fractional seconds)
+   * Why:
+   *   - datetime2(0) stores 0 fractional seconds — no .000 needed
+   *   - No 'Z' suffix — PHP/Carbon stores the literal value without UTC conversion
+   *   - Browser local clock = IST → stored time IS IST
+   *
+   * @param dateStr  'yyyy-MM-dd' string from a date input (user-selected date).
+   *                 The TIME component is taken from the current local (IST) clock.
+   */
+  buildIstDateTime(dateStr: string): string {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const hh  = pad(now.getHours());
+    const mn  = pad(now.getMinutes());
+    const ss  = pad(now.getSeconds());
+    const datePart = (dateStr || '').substring(0, 10);
+    if (datePart.length < 10) {
+      return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${hh}:${mn}:${ss}`;
+    }
+    return `${datePart} ${hh}:${mn}:${ss}`;
+  }
+
+  /**
+   * Safely extracts a 'yyyy-MM-dd' string from an API date field.
+   * Handles both the PHP date object { date: "YYYY-MM-DD HH:MM:SS.ffffff" }
+   * and plain string values — with NO new Date() parsing, so there is zero
+   * timezone shift risk.
+   *
+   * @param dateVal  Raw value from the API (object or string).
+   */
+  extractDateString(dateVal: any): string {
+    if (!dateVal) return '';
+    // PHP date object: { date: "2026-04-11 10:57:13.000000", timezone_type: 3, timezone: "UTC" }
+    if (typeof dateVal === 'object' && dateVal.date) {
+      return dateVal.date.substring(0, 10);
+    }
+    if (typeof dateVal === 'string') {
+      return dateVal.substring(0, 10);
+    }
+    return '';
+  }
+}
